@@ -1,4 +1,4 @@
-# Welcome to ECOG-314 -- Spring 2017
+# Welcome to ECOG-314 -- Fall 2017
 
 ## Using this Repository
 
@@ -61,7 +61,7 @@ All applicants must have completed a college level course in Econometrics with a
 2. [Getting Started in Data Analysis: Stata, R, SPSS, Excel: R](http://libguides.princeton.edu/dss/R)
   * A self-guided tour to help you find and analyze data using Stata, R, Excel and SPSS. The goal is to provide basic learning tools for classes, research and/or professional development.
 3. [An Introduction to Statistical Learning with Applications in R](http://www-bcf.usc.edu/~gareth/ISL/). Gareth James, et al. 2013. 
-  * Springer site to download the corrected 6th printing pdf with access to slides and 15 hours of lecture videos. 
+  * Faller site to download the corrected 6th printing pdf with access to slides and 15 hours of lecture videos. 
 4. There are many online resources for R. [Here](https://twitter.com/Rbloggers) is a Twitter feed of posts by R bloggers.
 5. [Regression analysis by Example](https://aritmatika.files.wordpress.com/2010/09/regression-by-example-4th-edition-samprit-chatterjee-ali-s-hadi.pdf). 
   * A Wiley series in statistics that provides a conceptually simple method for investigating relationships among variables.
