@@ -1,0 +1,444 @@
+## Federal Reserve Board of Governors
+## Howard University
+## Data Analysis in R course ECON 314
+## Introduction to visualization with ggplot2
+## INSTRUCTOR CODE
+
+setwd("/msu/home/m1skm01/Howard_ECOG_314/ggplot1_2017F/")
+
+# Reading in Data: read.csv()
+
+treasuries <- read.csv("Data/treasuries.csv", 
+                       stringsAsFactors = F,
+                       header = T)
+
+# Examining our Data
+head(treasuries, 3)
+treasuries[3,4]
+# Exercise 1: Examining our Data ------------------------------------------
+
+# Ok, now it's your turn: using the `tail()` function, 
+# I want to see the last 4 rows of treasury data
+tail(treasuries, 4)
+
+# Checking all of Our Classes
+
+class(treasuries$GS1)
+
+
+# Exercise 2: Checking types ----------------------------------------------
+
+# Using the `class()` function and the $ notation check the type 
+# for the rest of our columns.
+# What is the class of your "DATE" column?
+# What is the class of your UNRATE column?
+class(treasuries$GS3)
+class(treasuries$GS5)
+class(treasuries$GS10)
+class(treasuries$GS30)
+class(treasuries$UNRATE)
+
+
+# Converting character to numeric data
+
+treasuries$GS30 <- as.numeric(treasuries$GS30)
+class(treasuries$GS30)
+
+
+# Converting our values to dates
+
+as.Date("11/1/2016")
+
+# Adding formats to as.Date()
+
+as.Date("11/1/2016", format = "%m/%d/%Y")
+
+class(as.Date("11/1/2016", format = "%m/%d/%Y"))
+
+
+# Coverting multiple dates at once
+
+dates <- c("10/1/2015", "9/1/2015")
+as.Date(dates, format = "%m/%d/%Y")
+
+
+# Exercise 3: as.Date() ---------------------------------------------------
+
+# Now it's your turn, we know that we can return a single column of a data.frame 
+# as a vector using the $.
+# Create your own vector, "dates" which has the date values 
+# for the DATE column of the treasuries data.frame and display the first 3 values. 
+# You should get the following:
+dates <- as.Date(treasuries$DATE, "%m/%d/%Y")
+head(dates, 3)
+# Reassigning our DATE column
+
+treasuries$DATE <- dates
+class(treasuries$DATE)
+# Installing ggplot2
+# install.packages("ggplot2")
+
+
+# Attaching a package
+
+library(ggplot2)
+
+# First plot with ggplot
+GS5_data <- treasuries[, c("DATE", "GS5")]
+ggplot(data = GS5_data,
+       aes(x = DATE, y = GS5)) +
+    geom_line()
+
+
+
+# Exercise 4: First Plot --------------------------------------------------
+
+# Using the code from the previous slide, 
+# make a chart showing the interest rate of 10 year bonds over time
+ggplot(data = treasuries[, c("DATE", "GS10")],
+       aes(x = DATE, y = GS10)) +
+    geom_line()
+
+# Selecting our Data part II
+
+data_2016 <- tail(treasuries, 11)
+
+#First scatterplot
+
+ggplot(data = data_2016,
+       mapping = aes(x = DATE, y = GS10)) +
+    geom_point()
+
+
+
+# Exercise 5: GS5 ---------------------------------------------------------
+# Make a scatterplot for the 2016 values of the `GS5` column 
+# in the treasuries data.frame.
+ggplot(data_2016,
+       aes(x = DATE, y = GS5)) +
+    geom_point()
+
+
+# Forgetting your geom
+
+ggplot(data_2016,
+       aes(x = DATE, y = GS5))
+
+
+# Intro to Layering
+
+ggplot(data_2016, aes(x = DATE, y = GS10)) +
+    geom_line()
+
+# First line plot
+
+five_year_line_plot <- ggplot(data = data_2016,
+                              aes(x = DATE, y = GS5)) +
+    geom_line()
+
+five_year_line_plot
+
+
+# Storing our plots
+ggsave("five_year_line_plot.png", last_plot(), device = "png")
+
+# Plotting with date filters
+
+ggplot(data = treasuries[treasuries$DATE >= 
+                             as.Date("2016-01-01"),
+                         c("DATE", "UNRATE")],
+       aes(x = DATE, y = UNRATE)) + geom_line()
+
+
+# Exercise 6: Line Plot ---------------------------------------------------
+# Make a line plot for the 10 year treasury data for 2015 and 2016. 
+# After creating your plot, save it as "GS10_2015_2016.pdf"
+# Note that you should save it as a pdf
+data_15_16 <- treasuries[treasuries$DATE >= as.Date("2015-01-01"),
+                         c("DATE", "GS10")]
+ggplot(data_15_16, aes(x = DATE, y = GS10)) +
+    geom_line()
+ggsave("GS10_2015_2016.pdf", device = "pdf")
+
+#Why do you think the rate went down in 2016 only to go back up immediately after?
+
+# Layering with ggplot
+
+layer_one <- ggplot(data_2016, aes(x = DATE, y = GS10)) +
+    geom_line()
+
+
+# Layering with ggplot part 2
+
+layer_two <- layer_one + geom_point()
+layer_two
+
+## Can also make layer_two above in a single layer
+ggplot(data = data_2016, aes(x = DATE, y = GS10)) +
+    geom_line() + 
+    geom_point()
+
+
+
+# Exercise 7 - Layering ---------------------------------------------------
+# Create a layered line and point chart for the __GS30__ data for the year 2016. 
+ggplot(data = data_2016,
+       aes(x = DATE, y = GS30)) +
+    geom_line() +
+    geom_point()
+
+
+# Plotting multiple lines: Selecting your data
+
+recession_data <- treasuries[treasuries$DATE >= 
+                                 as.Date("2007-01-01")
+                             & treasuries$DATE < as.Date("2010-01-01"),
+                             c("DATE", "GS1", "GS5", "GS10", "GS30")]
+head(recession_data, 3)
+
+
+
+# Plotting multiple lines: First two lines
+
+ggplot(data = recession_data) +
+    geom_line(mapping = aes(x = DATE, y = GS1), 
+              color = "red") +
+    geom_line(mapping = aes(x = DATE, y = GS5), 
+              color = "green")
+
+
+# Exercise 8 - Plotting multiple lines ------------------------------------
+# Add the lines for `GS10` and `GS30`, they should be orange and blue respectively.
+ggplot(data = recession_data) +
+    geom_line(mapping = aes(x = DATE, y = GS1), 
+              color = "red") +
+    geom_line(mapping = aes(x = DATE, y = GS5), 
+              color = "green") +
+    geom_line(mapping = aes(x = DATE, y = GS10),
+              color = "orange") +
+    geom_line(mapping = aes(x = DATE, y = GS30),
+              color = "blue")
+
+
+
+# Plotting multiple lines: melting data
+library(tidyr)
+melted_data <- gather(recession_data, key = tenor,
+                      value = rate, -DATE)
+head(melted_data, 3)
+nrow(recession_data)
+nrow(melted_data)
+
+
+# Plotting multiple lines: the power of aes()
+
+ggplot(data = melted_data,
+       aes(x = DATE, y = rate, color = tenor)) +
+    geom_line()
+
+
+ggplot(data = melted_data,
+       aes(x = DATE, y = rate, linetype = tenor,
+           color = tenor)) +
+    geom_line()
+
+
+# Plotting multiple lines: titles and labels
+
+first_layer <- ggplot(data = melted_data,
+                      aes(x = DATE, y = rate, linetype = tenor,
+                          color = tenor)) +
+    geom_line() + 
+    geom_point()
+
+# ggtitle
+second_layer <- first_layer +
+    ggtitle("Treasury Yields", 
+            subtitle = "2007 - 2009")
+second_layer
+
+# Plotting multiple lines: Customizing our scales
+
+third_layer <- second_layer + 
+    scale_y_continuous(name = "Rate %")
+third_layer
+
+# Cleaning up our color scale
+
+fourth_layer <- third_layer +
+    scale_color_discrete("Tenor",
+                         labels = c("GS1" = "1 year", 
+                                    "GS5" = "5 year",
+                                    "GS10" = "10 year", 
+                                    "GS30" = "30 year"))
+
+fourth_layer
+
+
+# Plotting multiple lines: Harmonizing scales
+
+fifth_layer <- fourth_layer +
+    scale_linetype_discrete("Tenor",
+                            labels = c("GS1" = "1 year", 
+                                       "GS5" = "5 year",
+                                       "GS10" = "10 year", 
+                                       "GS30" = "30 year")) +
+
+fifth_layer
+
+# Plotting multiple lines: Date scales
+
+sixth_layer <- fifth_layer + scale_x_date(name=NULL,
+                                          date_breaks = "6 months", 
+                                          date_labels = "%b-%y")
+
+sixth_layer
+
+# Final Plot
+
+sixth_layer + 
+    labs(caption = "Data obtained from FRED")
+
+# Exercise 9: Plotting Multiple Lines -------------------------------------
+
+# Now it's your turn, make a plot of the unemployment rate, 3, 
+# 30, and 10 year treasury yields for 2015-2016.
+exercise_9_data <- treasuries[treasuries$DATE >= as.Date("2007-01-01") &
+              treasuries$DATE < as.Date("2010-01-01"),
+          c("DATE", "GS3", "GS30", "GS10", "UNRATE")]
+
+exercise_9_data <- gather(exercise_9_data,
+           key = tenor, value = rate, -DATE) 
+
+ggplot(exercise_9_data, aes(x = DATE, y = rate, 
+               color = tenor, linetype = tenor)) +
+    geom_line() + 
+    geom_point() +
+    ggtitle("Unemployment and Treasury Bonds",
+            "2007-2009") +
+    scale_x_date(NULL, date_breaks = "1 year", 
+                 date_labels = "%b/%Y") +
+    scale_y_continuous("Rate (percent)") +
+    scale_color_discrete(NULL,
+                         labels = c("GS3" = "3 year",
+                                    "GS30" = "30 year",
+                                    "GS10" = "10 year",
+                                    "UNRATE" = "Un-rate")) +
+    scale_linetype_discrete(NULL,
+                            labels = c("GS3" = "3 year",
+                                       "GS30" = "30 year",
+                                       "GS10" = "10 year",
+                                       "UNRATE" = "Un-rate"))
+
+
+
+# Box Plots
+
+box_data <- gather(treasuries[, 
+                              c("DATE","GS1", "GS5", "GS10")],
+                   key = tenor, value = rate, -DATE)
+ggplot(box_data, aes(x = tenor, y = rate)) +
+    geom_boxplot()
+
+
+tbill_boxes <- ggplot(box_data, aes(x = tenor, 
+                                    y = rate, fill = tenor)) +
+    geom_boxplot() +
+    labs(title = "Distribution of Rates on Treasury Bonds",
+         x = "Tenor", y = "Rate %") +
+    scale_fill_discrete(guide = F)
+tbill_boxes
+
+
+#Basic Histogram
+histogram <- ggplot(box_data,
+                    aes(x = rate, fill = tenor))
+histogram + geom_histogram(bins = 25)
+
+
+
+# Using the color option to make borders
+
+histogram +
+    geom_histogram(bins = 35, color = "black")
+
+# Basic Density Plot
+
+density_plot <- ggplot(box_data,
+                       aes(x = rate, fill = tenor)) +
+    labs(title = "Density Plot")
+density_plot + geom_density()
+
+# Dealing with Overlap: alpha
+density_plot + geom_density(alpha = 0.5)
+
+# Violin Plot
+
+violin <- ggplot(box_data, aes(x = tenor, y = rate,
+                               fill = tenor)) +
+    geom_violin() +
+    labs(title = "Distribution of Treasury Bonds",
+         fill = "Tenor", y = "Rate %")
+violin
+
+
+# Exercise 10 - Data Distribution -----------------------------------------
+
+# For the rest of the class work on creating 4 charts 
+# like the ones we just went over: boxplot, histogram, density, and violin plots
+# You should look at the following 4 values: GS3, GS10, GS30, and UNRATE
+# Use the scale functions
+# Your charts should look like the following:
+# You should make yours separately, do not worry about displaying all 4 at once
+# When you are finished save your plots to .png files
+exercise_data <- gather(treasuries[, c("GS3", "GS10", "GS30", "UNRATE")],
+                        key = tenor, value = rate)
+
+fill_labs <-  c("GS3" = "3 year",
+                "GS10" = "10 year", 
+                "GS30" = "30 year",
+                "UNRATE" = "Un-rate")
+# Box plot
+box_plot <- exercise_data %>% 
+    ggplot(aes(x = tenor, y = rate,
+               fill = tenor)) +
+    geom_boxplot() +
+    scale_fill_discrete(guide = F) +
+    scale_x_discrete("Tenor", labels = fill_labs) +
+    ggtitle("Treasury Bills and Unemployment",
+            "monthly historical rates") +
+    scale_y_continuous("Rate %") +
+    labs(caption = "Data obtained from FRED")
+
+histogram <- exercise_data %>% 
+    ggplot(aes(x = rate,
+               fill = tenor)) +
+    geom_histogram(bins = 35, color = "black") +
+    scale_fill_discrete("Tenor", labels = fill_labs) +
+    scale_x_continuous("Value") +
+    ggtitle("Treasury Bills and Unemployment",
+            "monthly historical rates") +
+    labs(caption = "Data obtained from FRED")
+
+density <- exercise_data %>% 
+    ggplot(aes(x = rate,
+               fill = tenor)) +
+    geom_density(alpha = 0.5, color = "black") +
+    scale_fill_discrete("Tenor", labels = fill_labs) +
+    scale_x_continuous("Value") +
+    ggtitle("Treasury Bills and Unemployment",
+            "monthly historical rates") +
+    labs(caption = "Data obtained from FRED")
+
+violin_plot <- exercise_data %>% 
+    ggplot(aes(x = tenor, y = rate,
+               fill = tenor)) +
+    geom_violin() +
+    scale_fill_discrete(guide = F) +
+    scale_x_discrete("Tenor", labels = fill_labs) +
+    ggtitle("Treasury Bills and Unemployment",
+            "monthly historical rates") +
+    scale_y_continuous("Rate %") +
+    labs(caption = "Data obtained from FRED")
+
+#Does the unemployment rate seem to differ from the Treasury rates?
