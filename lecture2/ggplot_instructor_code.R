@@ -1,25 +1,12 @@
---- 
-  title: "GGPLOT2"
-author: "wampeh"
-date: '`r Sys.Date()`'
-output:
-  html_document:
-  toc: yes
-revealjs::revealjs_presentation:
-  highlight: pygments
-theme: sky
----
-
 ## Federal Reserve Board of Governors
 ## Howard University
 ## Data Analysis in R course ECON 314
 ## Introduction to visualization with ggplot2
 ## INSTRUCTOR CODE
 
-#setwd("/msu/home/m1skm01/Howard_ECOG_314/ggplot1_2017F/")
+setwd("/msu/home/m1skm01/Howard_ECOG_314/ggplot1_2017F/")
 
 # Reading in Data: read.csv()
-```{r}
 
 treasuries <- read.csv("Data/treasuries.csv", 
                        stringsAsFactors = F,
@@ -37,7 +24,7 @@ tail(treasuries, 4)
 # Checking all of Our Classes
 
 class(treasuries$GS1)
-```
+
 
 # Exercise 2: Checking types ----------------------------------------------
 
