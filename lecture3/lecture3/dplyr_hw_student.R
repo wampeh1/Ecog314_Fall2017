@@ -17,9 +17,8 @@
 #  Libraries
 # ----------#
 
-# load the dplyr library
-library(dplyr)
-library(ggplot2)
+# load the dplyr, and ggplot2 libraries
+
 
 #--------------#
 # Exercise 1 (20 points)
@@ -69,7 +68,7 @@ lending_club_small <- select()
 
 #########
 # Part a. (5 points)
-# Right now the term varaible is a character taking on the values " 36 months" " 60 months".
+# Right now the term variable is a character taking on the values " 36 months" " 60 months".
 # using the mutate(), substr(), and as.numeric() functions, 
 # Create a column, term_num that takes on the values 36 or 60 based on the term column.
 # Be sure to re-assign the results back to lending_club_small
@@ -84,12 +83,11 @@ lending_club_small <- mutate()
 
 # Find the unique values of the emp_length variable (2 points)
 
-
-# Using the ifelse function as well as mutate() and other functions you need:
+answer2bi <- 
+# Using the case_when() function as well as mutate() and other functions you need:
 #     Create a new variable called emp_term which has numeric values for the
-#     number of years worked. Treat "< 1 year" as 0 and "10+ years" as 10. Assign your results to lending_club_small
-#     HINT: you can mutate the same variable multiple times within a mutate call. 
-    
+#     number of years worked. Treat "< 1 year" as 1 and "10+ years" as 10. Assign your results to lending_club_small
+
 
 lending_club_small <- 
 
@@ -101,9 +99,10 @@ lending_club_small <-
 
 ## ANSWER HERE
 
-#     Do you think it makes sense to leave it as an integer value
-#     or would it be more useful to bin the data into character based buckets
+#     Do you think it makes sense to leave total_acc as an integer value
+#     or would it be more useful to bin the data into buckets
 #     such as small, medium, large? 
+
 #     Use ggplot to plot a basic histogram of the total_acc variable with 30 bins
 #     be sure that your plot has an appropriate title and y-axis label, you should 
 #     turn off the x axis label 
@@ -113,11 +112,8 @@ lending_club_small <-
 ##################
 # Part d (10 points)
 
-#  Use the cut() function to create a new column, crdt_lines. 
-#      You will want to look up the syntax for this function. 
-#      But generally cuts takes three arguments: a vector that you want to cut, 
-#      a vector of the values to cut on and a vector of labels for each of the cuts.
-#      In this case the values should be "small" if total acc [0, 10], 
+#  Use the case_when() function to create a new column, crdt_lines. 
+#      In this case the values should be "small" if total_acc [0, 10], 
 #      "medium" if (10, 25] and "large" if (25, 100]. 
 #      Be sure to assign your data frame to lending_club_small
 #  Once you have cut the data into the three buckets, make an appropriately 
@@ -127,6 +123,8 @@ lending_club_small <-
 
 lending_club_small <- 
 
+# Answer free response question here
+    
 # ------------#
 # Exercise 3
 # ------------#
@@ -161,9 +159,12 @@ answer_3a <-
 #    First add a column to lending_club_small that is the leverage ratio 
 #    (call it lev_ratio), the ratio of loans to income, so you will want to use the 
 #    ttl_val column created at the end of question 2 and the annual income column.
+
 #    Then aggregate by income level and find the mean (call it avg_lev_ratio). 
+
 #    Once your data are set up, make a line plot of average annual income
 #    vs. average leverage ratio. 
+
 #    Does the plot give you additional information about how leveraged people are?
 #    (do people take on the same level of debt as a percentage of income at all income levels?)
 
@@ -193,39 +194,45 @@ answer_4a <-
 # or current, and "bad" as the rest. Write two vectors corresponding to
 # the correct loan statuses using the c() function
 
-good <- 
-bad  <- 
+good <- c()
+bad  <- c()
 
 
 ##########
 # Part c (10 points)
 # We want to know how many good and bad loans we have in our sample
+
 # To do this we will need to add a column called "status" to our 
 # lending_club_small data using the ifelse() function and the 
 # vectors created above. 
+
 # If the loan is good the status should be "good" otherwise it should be "bad".
+
 # Once we do that we will need to use dplyr to figure out the count.
 # You will want to group by the status column and call the dplyr n() function 
 # within you call to summarize()
-# Do you think this is a large enough sample size of both statuses to derive 
-# meaningful conclusions from generate statistics?
 
+# Do you think this is a large enough sample size of both statuses to derive 
+# meaningful conclusions and generate statistics?
 
 
 # First mutate your data
 lending_club_small <- 
 # Create a new dataframe with your summary statistics
-answer_3c <- 
+answer_4c <- 
 
 # Answer the short answer question below
 
 #############
 # Part d (10 points)
 # Let's take a deeper look at good vs bad loans
+
 # First we want to know the difference in the average loan amount between good and bad loans
+
 # Then we want to know if the interest rates on good and bad loans are similar
 # aka, do bad loans have higher interest rates? How much greater is the interest rate on
 # bad loans than good loans?
+
 # Do you think that higher interest rates cause more laons to go bad or 
 # do you think that people less likely to pay have higher interest rates to begin with?
 

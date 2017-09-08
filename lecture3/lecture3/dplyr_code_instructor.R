@@ -3,9 +3,10 @@
 ## Data Analysis in R Course
 ## Lecture 3: Introduction to Dplyr
 ## INSTRUCTOR CODE
-
+rm(list = ls())
+setwd("~/Howard_ECOG_314/dplyr_2017F/")
 ## Set your directory
-acs <- read.csv()
+acs <- read.csv("Data/ca_acs.csv", stringsAsFactors = F)
 
 
 # Examining our Data
@@ -14,7 +15,7 @@ names(acs)
 ncol(acs)
 
 # Install Dplyr
-
+library(dplyr)
 
 # dplyr::select
 income_data <- select(acs, AGEP, SEX, WAGP, WKHP,
@@ -23,6 +24,7 @@ names(income_data)
 
 # In Class Exercise: Select -----------------------------------------------
 
+exercise_1_data <- select(acs, SEX, WKHP, ADJINC, PWGTP, WAGP)
 
 # Filtering our data
 income_data <- filter(income_data, 
@@ -33,7 +35,7 @@ income_data <- filter(income_data,
 filter(acs, AGEP < 30)
 filter(acs, AGEP < 30 & SEX == 1)
 filter(acs, AGEP < 25 | AGEP > 65)
-filter(acs, Occ %in% c("Computer/Math", "Legal"))
+
 
 # filtering on multiple conditions
 identical(filter(income_data, AGEP == 24 & SEX == 1),
@@ -44,7 +46,9 @@ filter(income_data, AGEP == 24, SEX == 1))
 #  Re-assign your exercise_1_data data.frame to exercise_2_data and filter out any `NA` values in the columns
 #  Additionally, make sure that your WKHP variable is greater or equal to 10 and less than or equal to 60
 #  Your data should have the following dimensions:
-
+exercise_2_data <- filter(exercise_1_data, !is.na(SEX),
+!is.na(ADJINC), !is.na(PWGTP),
+!is.na(WAGP), WKHP >= 10, WKHP <= 60)
 
 
 # New Object creation workflow
@@ -93,13 +97,24 @@ gender_hours_data %>%
 select(SEX, gender, WKHP, Hours) %>% 
 head()
 
+# Case_When function
+adjusted_data %>% 
+    mutate(gender = case_when(SEX == 2 ~ "Female",
+                              SEX == 1 ~ "Male")) %>% 
+    select(SEX, gender) %>% 
+    head(3)
 
 # In Class Exercise: Mutate -----------------------------------------------
 
 # Now it's time to update your data: exercise_2_data
 # Update SEX, ADJINC, and WKHP as seen previously
 # Update WAGP to account for the adjustment factor
-
+exercise_3_data <- exercise_2_data %>% 
+    mutate(ADJINC = ADJINC/1000000,
+           WAGP = WAGP * ADJINC,
+           Gender = ifelse(SEX == 1, "Male", "Female"),
+           Hours = plyr::round_any(WKHP, 5, ceiling))
+head(exercise_3_data)
 
 # Deleting your columns
 "SEX" %in% names(gender_hours_data)
@@ -124,10 +139,16 @@ head(income_data_summary, 3)
 
 
 # In Class Exercise: group_by and summarize -------------------------------
-# Using the `group_by()` and `summarize()` functions find the mean and median values for each gender/hour combination
+# Using the `group_by()` and `summarize()` functions find the mean values for each gender/hour combination
 # save your output as `exercise_4_data`
 # Your data should look like the following:
 
+
+exercise_4_data <- exercise_3_data %>%
+    group_by(Gender, Hours) %>%
+    dplyr::summarise(wages = weighted.mean(WAGP, PWGTP))
+
+head(exercise_4_data)
 
 # Finding the top and bottom with arrange
 
@@ -142,7 +163,9 @@ income_data_summary %>%
 
 
 
-# In Class Exercise: arrange
+# In Class Exercise: arrange ----------------------------------------------
+
+
 # * Using your `exercise_4_data` find the bottom five observations for average wages
 # * You do not have to save your output to a variable
 # * what is their gender, the hours worked?
@@ -153,26 +176,27 @@ head(5)
 
 
 # Answering our Question
-library(ggplot2)
+# Widen the data
 library(tidyr)
-inc_wages_plot <- income_data_summary %>%
-    gather(key = payment, value = amount,-AGEP,-gender) %>%
-    ggplot(aes(
-        x = AGEP,
-        y = amount,
-        linetype = payment,
-        color = gender
-    )) +
+income_data_plot <- income_data_summary %>% 
+    gather(key = payment, value = amount,
+           -AGEP, -gender)
+
+# Plot the data
+
+library(ggplot2)
+
+inc_wages_plot <-  income_data_plot %>% 
+    ggplot(aes(x = AGEP, y = amount,
+               linetype = payment,
+               color = gender)) +
     geom_line() +
-    labs(
-        title = "Income and Wages",
-        linetype = "Payment\nType",
-        color = "Gender",
-        subtitle = "California 2010-2014 average",
-        x = "Age",
-        y = "2014 USD",
-        caption = "Data obtained from Census Bureau"
-    )
+    labs(title = "Income and Wages",
+         linetype = "Payment\nType",
+         color = "Gender",
+         subtitle = "California 2010-2014 average",
+         x = "Age", y = "2014 USD",
+         caption = "Data obtained from Census Bureau")
 inc_wages_plot
 
 
@@ -209,17 +233,35 @@ income_data_wide_ages %>%
 # In Class Exercise: Summarize --------------------------------------------
 # * Using the `exercise_3_data` create a chart showing mean wages for men and women by hours worked
 
+exercise_3_data %>% group_by(Gender, Hours) %>%
+    dplyr::summarise(wages = weighted.mean(WAGP, PWGTP)) %>%
+    ggplot(aes(
+        x = Hours,
+        y = wages,
+        linetype = Gender,
+        color = Gender
+    )) +
+    geom_line() +
+    ggtitle("Wages by Hours worked",
+            "5-hour buckets") +
+    labs(
+        x = "Weekly Hours",
+        y = "2014 USD",
+        caption = "Data obtained from Census",
+        color = "Gender",
+        linetype = "Gender"
+    )
 
-# What message does this chart show about wage inequality compared with our previous chart? What more questions do you have?
+# What message does this chart show about wage inequality compared with our previous chart? What more data would you want?
 
 # Joins
-county_xwalk <- read.csv("Data/puma10_county_xwalk.csv", 
-stringsAsFactors = F)
+county_xwalk <- read.csv("Data/puma10_county_xwalk.csv",
+                         stringsAsFactors = F)
 head(county_xwalk, 3)
 
 # Joining our Data
-joined_data <- gender_hours_data %>% 
-inner_join(county_xwalk, by = c("PUMA10" = "puma12")) 
+joined_data <- gender_hours_data %>%
+    inner_join(county_xwalk, by = c("PUMA10" = "puma12"))
 names(joined_data)
 
 # County Level Statistics
@@ -235,12 +277,11 @@ joined_data %>%
 # County Income Ratio
 joined_data %>%
     group_by(county, gender) %>%
-    summarize(wages = weighted.mean(WAGP, PWGTP),
-              observations = sum(PWGTP)) %>%
+    summarize(wages = weighted.mean(WAGP, PWGTP)) %>%
     mutate(ratio = wages / lag(wages)) %>%
     filter(!is.na(ratio)) %>%
     arrange(desc(ratio)) %>%
-    select(county, ratio, observations) %>%
+    select(county, ratio) %>%
     head()
 
 # Challenge exercise 1
@@ -255,7 +296,18 @@ joined_data %>%
 # + in the `geom_bar()` make sure to include `stat = "identity"`
 
 # Challenge Exercise 1 Answer
-
+exercise_3_data %>% 
+    group_by(Gender, Hours) %>% 
+    dplyr::summarize(count = sum(PWGTP)) %>%
+    ungroup() %>% 
+    group_by(Hours) %>% 
+    mutate(tot = sum(count),
+           perc = (count/tot)*100) %>% 
+    ggplot(aes(x = as.character(Hours), fill = Gender, y = perc)) +
+    geom_bar(stat = "identity") +
+    ggtitle("Gender makeup of hours worked",
+            "5-hour buckets") +
+    labs(y = "Percent", x = "Hours")
 
 # Challenge Exercise 2
 # * Using dplyr and ggplot analyze how wage (WAGP) changes over age between men and women 
@@ -267,6 +319,26 @@ joined_data %>%
 # * You will need to start with the original ACS data to answer this
 
 # Challenge Exercise 2: Answer
+gender_hours_age <- acs %>% 
+    select(PWGTP, AGEP, WAGP, SEX, WKHP, ADJINC) %>% 
+    filter(!is.na(WAGP), !is.na(SEX), !is.na(PWGTP),
+           WKHP >= 20, WKHP <= 60) %>% 
+    mutate(Gender = ifelse(SEX == 1, "Male", "Female"),
+           Wages = (ADJINC/1000000)*WAGP,
+           Hours = plyr::round_any(WKHP, 10),
+           Age = plyr::round_any(AGEP, 5)) %>% 
+    select(PWGTP, Gender, Wages, Hours, Age) %>% 
+    group_by(Gender, Hours, Age) %>% 
+    summarise(mean_wage = weighted.mean(Wages, PWGTP))
 
+gender_hours_age %>% 
+    ggplot(aes(x = Age, y = mean_wage, color = Gender, 
+               linetype = as.character(Hours))) +
+    geom_line() + 
+    ggtitle("Accounting for weekly hours worked") +
+    labs(y = "2014 USD", linetype = "Hours",
+         caption = "Data obtained from Census")
 
 #Insights? Further Questions? Is this a "good" chart?
+# No this is not a good chart, it is very hard to understand what is happening
+# is difficult to distinguish our different groups
