@@ -1,0 +1,446 @@
+---
+title: "Tidying Data with R"
+subtitle: "Lecture 4"
+output: 
+    beamer_presentation:
+      theme: "Frankfurt"
+      colortheme: "dolphin"
+      toc: FALSE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 50)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(tidyr)
+library(ggplot2)
+library(zoo)
+
+load("tidydata_data.Rdata")
+```
+
+## Today's Lecture
+The goal of this lecture is to delve deeper into common forms of data work. The reason we work with data is to find answers of interest to us, but the data we find or receive is rarely in the form we need. Oftentimes this impedes our ability to even begin such an analysis. Common issues with messy data and our topics for today:  
+
+* Vectors/variables are of the wrong type
+    + Dates
+* Strings have extra, unneeded information
+    + Extracting parts of a character string
+    + Fixing typos
+* Information in a table is difficult to extract
+    + Wide and long form data
+    + Reshaping data
+* Information is spread across multiple tables
+    + Merging data with dplyr
+
+#
+### Introduction to data and research goal
+
+The research goal for this lecture is to study the effects of banks' characteristics on lending behavior. Some key measurements relevant to this research might be:
+
+* Number of loans/total principal issued every month  
+* Type of banks with heavy lending activity vs. little lending activity  
+* Proportion of loans, between private and government loans, being issued  
+* etc. Can you name some more?
+
+#
+### The available data
+To address our question(s) we will use what we have available to us, the banks dataset.
+```{r }
+head(banks)
+```
+
+#
+### Banks data
+```{r echo = FALSE}
+ggplot(banks, aes(x = loanID)) + 
+  geom_bar(stat = "count") +
+  labs(title = "Frequency of loans by loan type")
+```
+
+#
+### Banks continued
+```{r echo = FALSE}
+ggplot(banks, aes(x = principal, fill = 1)) + 
+  geom_density(alpha = 0.5, color = NA) + 
+  facet_grid(. ~ as.factor(loanID)) + 
+  guides(fill = FALSE) +
+  labs(title = "Distribution of daily loan principals by type of loan")
+```
+
+#
+Important questions to consider:  
+
+* What in banks seems useful? 
+* What seems unneeded? 
+* Can you think of any additional variables that would be useful for us?  
+
+Let's zoom in on the date variable. What type of vector was the date variable read in as?   
+
+# 1. Vectors/variables are of the wrong type  
+
+## Dates in R
+* R treats dates as a uniquely-formatted vector type, represented as:  "YYYY-MM-DD".    
+* The as.Date() function can convert strings into this date vector type.    
+* Since dates are a vector type, they can be assigned to objects like any other variable, and R can do most operations (that make sense) on dates, simply as part of the basic R package.  
+```{r}
+dates <- c(as.Date("2010-01-01"), as.Date("2010-12-31"))
+
+print(dates)
+```
+
+#
+### Dates can behave like numbers
+```{r}
+mean(dates)
+min(dates)
+as.Date("2010-02-10") + 10
+```
+
+#
+### Formatting dates
+R can convert many, many different looking strings into a date class using the "format" argument in as.Date:
+```{r}
+as.Date("19800210", format = "%Y%m%d")
+
+as.Date("10Feb80", format = "%d%b%y")
+
+as.Date("9/18/2016", format = "%m/%d/%Y")
+```
+
+#
+### Date symbols for reference
+Symbol  | Meaning
+------- | ---------------------------------
+%d      | Day as a number
+%a      | Abbreviated Weekday
+%A      | Unabbreviated Weekday
+%m      | Month as a number
+%b      | Abbreviated month
+%B      | Unabbreviated month
+%y      | Two-digit year
+%Y      | Four-digit year
+
+
+#
+### In-class exercise:
+Convert the following character vector to a date vector.  
+```{r}
+date_vec <- c("Day 5 of March, 2017", 
+              "Day 23 of May, 2017")
+```
+
+
+#
+Format is both an argument and a function itself:
+
+```{r}
+Sys.Date()
+format(Sys.Date(), "%d %B %Y")
+format(Sys.Date(), "%d-%b")
+format(Sys.Date(), "%Y")
+```
+
+#
+R can even use the seq command to generate strings of dates, which can be helpful when cleaning data.
+```{r}
+dates <- seq(as.Date("2015-01-01"), 
+             to = as.Date("2015-12-31"), 
+             by = "month")
+print(dates)
+mean(dates)
+max(dates)
+```
+
+#
+### In-class exercise:
+Use the seq() command to generate a vector of every month-end date in 2010.
+
+
+#
+Rather technical notes:  
+In the case of two digit years, R (currently) assumes that years 00-68 are 2000 - 2068, and years 69-99 are 1969 - 1999.  
+
+R can even import from Excel, with Excel's wierd 5-digit dates.
+```{r}
+# From Windows Excel
+as.Date(30829, origin = "1899-12-30")
+
+# From iOS Excel
+as.Date(29367, origin = "1904-01-01")
+```
+
+# Using [lubridate](https://cran.r-project.org/web/packages/lubridate/lubridate.pdf) to handle dates
+```{r warning=FALSE}
+# Lubridate introduction
+
+# Date creation functions:
+# ymd()
+# dmy()
+# mdy()
+
+banks <- banks %>%
+              mutate(date = ymd(date))
+```
+
+The date creation functions of lubridate do what as.Date() does, but the formatting conditions are not buried within an argument in the function; rather, each format type is denoted by the function name itself.
+
+#
+### Accessor functions in lubridate
+```{r }
+# year()
+# month()
+# mday()
+# yday()
+# wday()
+
+banks <- banks %>%
+              mutate(monthonly = month(date),
+                     yearonly  = year(date))
+```
+
+#
+* Now we know and, perhaps more importantly, can reference the month and the year belonging to each observation.  
+* Which functions from dplyr could we next use to calculate our desired monthly statistic(s)?
+    + Total loans, by number and principal, issued per month  
+
+# 2. Strings have extra, unneeded information  
+
+## Text patterns, splitting, and extracting
+The three major charter types for depository institutions are:  
+
+* commercial banks, 
+* savings/thrift banks, and 
+* credit unions.  
+
+#
+* We might believe banks behave differently based on their charter type for many reasons; different regulatory requirements and different targeted customer base might be two of the most compelling.  
+* Therefore, we will want to make sure this measurement is reasonably coded in our dataset.
+
+#
+```{r}
+# Let's see what kinds of charters we have in the 
+# variable 'type'
+unique(banks$type)
+```
+
+# Using [stringr](https://cran.r-project.org/web/packages/stringr/stringr.pdf) to handle character strings  
+  
+* Every stringr function begins with the prefix str_, str being short for string. 
+* As the names suggest, the stringr functions are a toolbox of string manipulators. 
+* As you will see for yourself, many of these string functions have to do with locating patterns in text.
+
+#
+```{r}
+# str_detect returns a logical vector for where 
+# the pattern was found
+str_detect(string = c("a", "b", "c"), pattern = "b")  
+
+# str_which returns the indices where the pattern 
+# was found
+str_which(string = c("a", "b", "c"), pattern = "b")  
+
+# str_replace replaces patterns within text strings
+str_replace("abc", pattern = "a", replacement = "c") 
+```
+
+#
+We can use str_detect() to filter to observations that somewhat look like Savings. Once we have identified these elements, we can then reassign all of those to the same phrase. First, we will need an introduction to str_to_lower().
+
+```{r}
+# str_to_lower
+str_to_lower(c("A", "B", "C"))
+str_to_lower(c("Lower", "Case"))
+
+# Alternatively, there is a str_to_upper
+str_to_upper(c("Upper", "Case"))
+```
+
+#
+This is useful in our case since there are multiple variations of Savings both with and without upper case characters. To make our job of detecting these variations simpler, we will use a version of the variable 'type' where all characters are in the same case.
+```{r}
+type_lower <- str_to_lower(banks$type)
+
+#Using str_detect to filter rows
+banks[str_detect(type_lower, "sav"), "type"] <- "Savings"
+
+# Check unique values of 'type' again to see if we 
+# need to address more cases of misspellings
+unique(banks$type)
+
+# No longer need type_lower - can remove it to tidy up
+rm(type_lower)
+```
+
+#
+Now that the typos are gone, what are some tasks we can do that we could not before? Can we extract information about meaningful subgroups in our dataset?  
+```{r}
+TypeSmmry <- banks %>% 
+              group_by(yearonly, monthonly, type) %>%
+              summarize(monthlyCount = sum(loan_num),
+                        monthlyValue = sum(principal))
+head(TypeSmmry)
+```
+
+#
+* So for each true, unique type of bank in our dataset we have a monthly measure of issued loans by number and principal.  
+* We could have instead chosen, and still can choose, to look at quarterly totals, yearly totals, daily totals, etc. Can you think of reasons why we aggregated our data up to the month level?   
+
+#
+```{r echo = FALSE, message = FALSE}
+ggplot(TypeSmmry, aes(x = as.yearmon(paste0(yearonly, monthonly), "%Y%m"), fill = as.factor(type))) +
+ geom_col(aes(y = TypeSmmry$monthlyCount)) +
+ scale_x_yearmon() +
+ labs(fill = "Charter Type", x = NULL, y = "Loans per Month", 
+        title = "Number of loans per month by charter type") +
+ scale_fill_manual(values = c("burlywood2", "burlywood3", "burlywood4"))
+
+# ggplot(TypeSmmry, aes(x = as.yearmon(paste0(yearonly, monthonly), "%Y%m"), y = monthlyCount, colour = as.factor(type))) +
+#   geom_line() + 
+#   scale_y_continuous(limits = c(0, 1500)) +
+#   labs(colour = "Type Type", x = "Date", y = "Loans per Month")
+```
+
+# 
+###In Class Exercise:
+Convert the following vector, numbers, to numeric type.  
+```{r}
+numbers <- c("2,100", "3,250,000")
+```
+
+#
+The next task concerns yet another measurement of interest: proportion of private to government loans.  
+
+* Do we have variables that allow us to identify private and government loans yet?  
+  
+  
+```{r }
+# Let's take a look at loanID
+unique(banks$loanID)
+```
+  
+#  
+* Every value in loanID begins with either a "P" or a "G".  
+* "P" is shorthand for private, and so it denotes private loans, and "G" is shorthand for government, so observations with loanID "G..." are government loans.  
+* This is pretty close to the measurement we want, but not quite. Our measurement needs to be generalised enough so that we are just comparing private and government across observations.  
+* What we really need are just the P's and G's.  
+   
+* Introducing str_sub():  
+
+#  
+```{r }
+# To completely define a substring, you always only 
+# need three things:
+## 1. the full string,
+## 2. the starting position of the substring, and
+## 3. the ending position of the substring.
+
+# Extract characters from a text string
+str_sub("abcd", start = 1, end = 3) 
+str_sub("abcd", start = 1, end = 2)
+```
+
+#
+To split a string apart into multiple pieces we would use str_split().
+```{r}
+# Splits a text string whenever the pattern 
+# argument is found
+str_split("abcd", pattern = "c")  
+str_split("keep_these_parts", pattern = "_")
+```
+* Seeing these two stringr functions in action, which one could we use to arrive at our goal of extracting the P's and G's from loanID?
+
+#
+```{r}
+# We can use str_sub() to extract the P's and G's 
+# in loanID
+banks <- banks %>%
+          mutate(loantype = str_sub(loanID, 
+                                    start = 1, 
+                                    end = 1))
+```
+
+#
+```{r echo = FALSE}
+ggplot(banks, aes(x = date, 
+                  fill = as.factor(loantype))) +
+  geom_density(position = "fill", color = NA) +
+  scale_x_date() +
+  labs(fill = "Private or Government:", x = NULL, 
+       title = "Proportions of private and government loans over time") +
+  theme(legend.position = "top")
+```
+  
+  
+# 3. Information in a table is difficult to extract  
+
+* We will be using [tidyr](https://cran.r-project.org/web/packages/tidyr/tidyr.pdf)'s two main functions: spread() and gather().
+    + The former helps you deal with rows that are not complete observations and the latter with columns that are not variables.
+* To demonstrate these methods of tidying data, we will be using the two datasets stocks_l and stocks_w.
+
+#
+```{r }
+head(stocks_l)
+head(stocks_w)
+```
+
+#
+Believe it or not the same exact information is stored in these two datasets. The "form" that stocks_l takes is often referred to as long-form data and stocks_w wide-form data. Advantages exist for both forms:  
+  
+* Long
+    + Conceptually clear - you can quickly recognize what constitutes a unique observation in the data.
+    + Great for grouping - if you want color, shape, fill, etc. dimensions in your ggplots this is the form you want.
+* Wide
+    + Extremely common way to store data - the people storing data are typically those that enter data. Wide form usually makes entering data easier.  
+    
+We can go from one to the other fairly easily in R thanks to packages like tidyr (spread/gather) and reshape2 (dcast/melt). 
+
+#
+```{r warning=FALSE}
+library(tidyr)
+
+stocks_w %>%
+  gather(`2007`, `2008`, `2009`, 
+         key = "Year", value = "Price") %>%
+  head()
+```
+Besides some rearrangement of rows, we put stocks_w through a gather() function and got an output exactly like stocks_l.  
+
+#  
+Think of spread() and gather() as inverses: one goes wide-to-long and the other long-to-wide (generally). Here we will spread stocks_l, although typically there is little reason to spread a tidy dataset like stocks_l.  
+```{r}
+
+stocks_l %>%
+  spread(key = Year, value = Price)
+```
+  
+  
+# 4. Information is spread across multiple tables  
+
+* A common practice in data analysis is to combine multiple sources of information together in order to increase research potential.  
+* Compared to most other common operations in R, there are few built-in precautions when merging data.  
+    + As a result, it's extremely easy to make a mistake without realizing it. **Always review your output!**  
+
+# loanDescriptions dataset  
+* Structural table describing the attributes for a multitude of loans  
+    + If we are able to connect this data to the banks dataset we would then be able to expand our study
+```{r}
+head(loanDescriptions)
+
+```
+
+# 
+###In Class Exercise:
+Using banks and loanDescriptions complete the following:  
+
+* Calculate the aggregate revenue on loans for banks within each of the charter types  
+* Calculate the proportions of the charter revenue held by each bank of that type  
+* Return the largest contributor to revenue in each district  
+    + By bank  
+    + By loan type
+
