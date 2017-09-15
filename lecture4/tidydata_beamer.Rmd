@@ -6,6 +6,8 @@ output:
       theme: "Frankfurt"
       colortheme: "dolphin"
       toc: FALSE
+      includes:
+        in_header: rmFigNumbering.tex
 ---
 
 ```{r setup, include=FALSE}
@@ -14,11 +16,13 @@ options(width = 50)
 ```
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-library(dplyr)
+library(tidyverse)
+
+# library(dplyr)
 library(lubridate)
 library(stringr)
-library(tidyr)
-library(ggplot2)
+# library(tidyr)
+# library(ggplot2)
 library(zoo)
 
 load("tidydata_data.Rdata")
@@ -32,11 +36,11 @@ The goal of this lecture is to delve deeper into common forms of data work. The 
 * Strings have extra, unneeded information
     + Extracting parts of a character string
     + Fixing typos
+* Information is spread across multiple tables
+    + Merging data with dplyr
 * Information in a table is difficult to extract
     + Wide and long form data
     + Reshaping data
-* Information is spread across multiple tables
-    + Merging data with dplyr
 
 #
 ### Introduction to data and research goal
@@ -89,7 +93,8 @@ Let's zoom in on the date variable. What type of vector was the date variable re
 * The as.Date() function can convert strings into this date vector type.    
 * Since dates are a vector type, they can be assigned to objects like any other variable, and R can do most operations (that make sense) on dates, simply as part of the basic R package.  
 ```{r}
-dates <- c(as.Date("2010-01-01"), as.Date("2010-12-31"))
+dates <- c(as.Date("2010-01-01"), 
+           as.Date("2010-12-31"))
 
 print(dates)
 ```
@@ -184,6 +189,11 @@ as.Date(29367, origin = "1904-01-01")
 # dmy()
 # mdy()
 
+# Let's use a lubridate function to change date in 
+# banks to a Date vector
+```
+
+```{r echo=FALSE, warning=FALSE}
 banks <- banks %>%
               mutate(date = ymd(date))
 ```
@@ -192,13 +202,20 @@ The date creation functions of lubridate do what as.Date() does, but the formatt
 
 #
 ### Accessor functions in lubridate
-```{r }
-# year()
-# month()
-# mday()
-# yday()
-# wday()
+```{r}
+# year()  
+# month()  
+# mday()  
+# yday()  
+# wday()  
 
+# We will use accessor functions to create the 
+# following variables in banks:  
+#     monthonly
+#     yearonly
+```
+
+```{r warning=FALSE, echo=FALSE}
 banks <- banks %>%
               mutate(monthonly = month(date),
                      yearonly  = year(date))
@@ -219,8 +236,8 @@ The three major charter types for depository institutions are:
 * credit unions.  
 
 #
-* We might believe banks behave differently based on their charter type for many reasons; different regulatory requirements and different targeted customer base might be two of the most compelling.  
-* Therefore, we will want to make sure this measurement is reasonably coded in our dataset.
+* Banks may behave differently based on their charter type.  
+* We will want to make sure charter type is reasonably coded in our dataset.
 
 #
 ```{r}
@@ -231,8 +248,8 @@ unique(banks$type)
 
 # Using [stringr](https://cran.r-project.org/web/packages/stringr/stringr.pdf) to handle character strings  
   
-* Every stringr function begins with the prefix str_, str being short for string. 
-* As the names suggest, the stringr functions are a toolbox of string manipulators. 
+* Every stringr function begins with the prefix str_. 
+* The stringr functions are a toolbox of string manipulators. 
 * As you will see for yourself, many of these string functions have to do with locating patterns in text.
 
 #
@@ -266,9 +283,21 @@ This is useful in our case since there are multiple variations of Savings both w
 ```{r}
 type_lower <- str_to_lower(banks$type)
 
-#Using str_detect to filter rows
-banks[str_detect(type_lower, "sav"), "type"] <- "Savings"
+# Using type_lower and str_detect(), let's fix
+# the type variable
+# banks <- banks %>%
+#   mutate(type = )
+```
 
+```{r echo=FALSE}
+banks <- banks %>%
+  mutate(type = ifelse(str_detect(type_lower, "sav"),
+                       "Savings",
+                       type))
+```
+
+#
+```{r}
 # Check unique values of 'type' again to see if we 
 # need to address more cases of misspellings
 unique(banks$type)
@@ -278,7 +307,9 @@ rm(type_lower)
 ```
 
 #
-Now that the typos are gone, what are some tasks we can do that we could not before? Can we extract information about meaningful subgroups in our dataset?  
+What are some tasks we can do that we could not before?  
+
+#
 ```{r}
 TypeSmmry <- banks %>% 
               group_by(yearonly, monthonly, type) %>%
@@ -289,7 +320,7 @@ head(TypeSmmry)
 
 #
 * So for each true, unique type of bank in our dataset we have a monthly measure of issued loans by number and principal.  
-* We could have instead chosen, and still can choose, to look at quarterly totals, yearly totals, daily totals, etc. Can you think of reasons why we aggregated our data up to the month level?   
+* Can you think of reasons why we aggregated our data up to the month level?   
 
 #
 ```{r echo = FALSE, message = FALSE}
@@ -326,9 +357,8 @@ unique(banks$loanID)
   
 #  
 * Every value in loanID begins with either a "P" or a "G".  
-* "P" is shorthand for private, and so it denotes private loans, and "G" is shorthand for government, so observations with loanID "G..." are government loans.  
-* This is pretty close to the measurement we want, but not quite. Our measurement needs to be generalised enough so that we are just comparing private and government across observations.  
-* What we really need are just the P's and G's.  
+* "P" is shorthand for private, and so it denotes private loans, and "G" is shorthand for government
+* What we really need are just the P's and G's  
    
 * Introducing str_sub():  
 
@@ -359,10 +389,15 @@ str_split("keep_these_parts", pattern = "_")
 ```{r}
 # We can use str_sub() to extract the P's and G's 
 # in loanID
+# banks <- banks %>%
+#           mutate(loantype = )
+```
+
+```{r echo=FALSE}
 banks <- banks %>%
-          mutate(loantype = str_sub(loanID, 
-                                    start = 1, 
-                                    end = 1))
+  mutate(loantype = str_sub(loanID,
+                            start = 1,
+                            end = 1))
 ```
 
 #
@@ -376,8 +411,74 @@ ggplot(banks, aes(x = date,
   theme(legend.position = "top")
 ```
   
+#
+###In Class Exercise:
+Use var_string and str_split to calculate the average value of loans by loan type.
+```{r}
+var_string <- "principal, loan_num"
+```
   
-# 3. Information in a table is difficult to extract  
+# 3. Information is spread across multiple tables  
+
+* A common practice in data analysis is to combine multiple sources of information together  
+* Compared to most other common operations in R, there are few built-in safeguards when merging data.  
+    + As a result, it's extremely easy to make a mistake without realizing it. **Always review your output!**  
+
+# Joining related data  
+
+* Base R: merge()  
+    + merge(object 1, object 2, how to join them, what to keep/add)
+* Dplyr: the join family - ?join to view all  
+    + *_join(object 1, object 2, how to join them)  
+
+# How to know which join statement to use  
+
+Mutate joins  
+
+* left_join is for augmenting an existing data frame - it always keeps all rows from the first object  
+    + right_join is similar  
+* full_join is for combining the entirety of two tables together (all rows and columns from both objects)  
+
+Filter joins  
+
+* inner_join filters the first object to rows with corresponding matches in the second object (could be considered a mutate join since it adds variables)  
+    + semi_join is similar except it does not add the variables from the second object  
+* anti_join only keeps records from the first object that did not get matched with the second object
+
+#
+![Joining data by [Tim Stuart](http://timoast.github.io/2016/09/22/r_demo/)](joins_byTimoast.png)
+
+# loanDescriptions dataset  
+* Structural table describing the attributes for a multitude of loans  
+    + If we are able to connect this data to the banks dataset we would then be able to expand our study
+```{r}
+head(loanDescriptions)
+
+```
+
+#
+```{r}
+left_join(banks, loanDescriptions, by = "loanID") %>% 
+  dim()
+full_join(banks, loanDescriptions, by = "loanID") %>% 
+  dim()
+inner_join(banks, loanDescriptions, by = "loanID") %>% 
+  dim()
+```
+* Explain the differences
+
+# 
+###In Class Exercise:
+Using banks and loanDescriptions complete the following:  
+
+* Calculate the aggregate revenue on loans for banks within each of the charter types  
+* Calculate the proportions of the charter revenue held by each bank of that type  
+* Return the largest contributor to revenue in each district  
+    + By bank  
+    + By loan type
+
+
+# 4. Information in a table is difficult to extract  
 
 * We will be using [tidyr](https://cran.r-project.org/web/packages/tidyr/tidyr.pdf)'s two main functions: spread() and gather().
     + The former helps you deal with rows that are not complete observations and the latter with columns that are not variables.
@@ -390,7 +491,7 @@ head(stocks_w)
 ```
 
 #
-Believe it or not the same exact information is stored in these two datasets. The "form" that stocks_l takes is often referred to as long-form data and stocks_w wide-form data. Advantages exist for both forms:  
+The same exact information is stored in these two datasets. The "form" that stocks_l takes is often referred to as long-form data and stocks_w wide-form data. Advantages exist for both forms:  
   
 * Long
     + Conceptually clear - you can quickly recognize what constitutes a unique observation in the data.
@@ -420,27 +521,3 @@ stocks_l %>%
 ```
   
   
-# 4. Information is spread across multiple tables  
-
-* A common practice in data analysis is to combine multiple sources of information together in order to increase research potential.  
-* Compared to most other common operations in R, there are few built-in precautions when merging data.  
-    + As a result, it's extremely easy to make a mistake without realizing it. **Always review your output!**  
-
-# loanDescriptions dataset  
-* Structural table describing the attributes for a multitude of loans  
-    + If we are able to connect this data to the banks dataset we would then be able to expand our study
-```{r}
-head(loanDescriptions)
-
-```
-
-# 
-###In Class Exercise:
-Using banks and loanDescriptions complete the following:  
-
-* Calculate the aggregate revenue on loans for banks within each of the charter types  
-* Calculate the proportions of the charter revenue held by each bank of that type  
-* Return the largest contributor to revenue in each district  
-    + By bank  
-    + By loan type
-
