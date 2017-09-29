@@ -1,0 +1,46 @@
+---
+title: "Lecture 6 Homework"
+author: ""
+date: ""
+output: pdf_document
+---
+
+## Instructions
+
+1. Use features of R Markdown to complete the exercises in each section. 
+    * Follow the instructions given under each numbered section heading. 
+    * Provide your answers by inserting markdown text and R code into this file. 
+
+2. Submit reproducible results. 
+    * For full credit, the final document must compile without error. 
+    * For partial credit on an item, include a partial solution **and** discuss the issue: describe what you tried, what went wrong, or share possible solutions. Use comments and code block options to skip broken code, as needed.
+    
+3. Submit tidy results
+
+4. Turn in your work no later than 11:59pm on Thursday October __
+    * tag the homework
+    * submit to instructors group
+    
+----
+
+## 1. Import Data
+
+```{r download-raw-data, eval = FALSE}
+if ( !file.exists( "foo.csv" ) ) {
+    download.file("http://foo.csv", "foo.csv")
+}
+```
+
+
+
+
+## 2. Tidy Data
+
+
+## 3. Transform Data
+
+
+## 4. Visualize Data
+
+
+## 5. Communicate

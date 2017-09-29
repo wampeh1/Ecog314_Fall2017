@@ -1,0 +1,129 @@
+---
+title: "Communicating Results with R Markdown"
+author: "Damian Thomas"
+date: "2017-10-06"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Objectives for this session
+
+* Use Markdown syntax to format text
+* Use R Markdown features to embed code in a document
+* Complete an analysis and present results using R Markdown
+* Output multiple document formats using R Markdown (html, pdf, slides)
+* List the advantages of R markdown 
+* Define reproduciblity and differentiate from related concepts (replication, tidyness, literate programming) 
+
+
+## What is R Markdown?
+
+*"R Markdown provides an unified authoring framework for data science, combining your code, its results, and your prose commentary. R Markdown documents are fully reproducible and support dozens of output formats, like PDFs, Word files, slideshows, and more."*
+
+[Garrett Grolemund and Hadley Wickham. R for Data Science (Ch 27)]([http://r4ds.had.co.nz/r-markdown.html)
+
+
+## What is R Markdown?
+
+* R code + Formatted text = Complete record of analysis
+
+
+## Example: R Markdown Report
+
+*Showcase compelling examples*
+
+
+## How-To: Create a new R Markdown document
+
+1. From the menu: File >> New >> R Markdown
+2. Give the file a name with a `.Rmd` extension
+3. Enter a title (optional)
+4. Click OK
+
+
+## R Markdown Document Structure
+
+* Front Matter
+* Markdown text
+* R code blocks
+* inline code
+
+
+## How-To: Knit an R Markdown document
+
+* Click on the "Knit" button
+* Type `Ctrl + Shift + K`
+* Use the menu: File >> Knit Document
+
+
+## Edit a R Markdown Document
+
+* Change the title
+* Change text
+* Change code block
+* Error handling
+
+
+## What happens in the background when you knit an R Markdown document
+
+* Interpret the markdown text
+* Run the code chunks
+* insert the results into the document
+* output a new file, if all is well
+
+
+## How-To: Knit different file formats
+
+* Click the dropdown next to the Knit button
+    * select output format
+    
+* Change the the document header
+    * `output: html_document`
+    * `output: pdf_document`
+    * `output: beamer_presentation`
+
+
+## More edits
+
+
+* Hide code block
+* Skip code block
+* Inline Code
+* Display plot
+* Display table
+
+## Motivation / beneits
+
+
+* Share your work with others
+* Check your work and update it, time saver in the future
+* Answer questions about previous work 
+* Allow others build on what you have done, instead of working to recreate it
+* Apply previously developed process to new data
+* Encourage trust in the results, if peers can plausibly recreate
+* Capture what you did, how you did it, and what you were thinking in a single presentation-ready document
+
+
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
