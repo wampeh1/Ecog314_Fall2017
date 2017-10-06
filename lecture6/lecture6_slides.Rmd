@@ -1,0 +1,369 @@
+---
+title: "Lecture 6 Slides"
+author: "Damian Thomas"
+date: "2017-10-06"
+output: beamer_presentation
+---
+
+
+```{r load-r-packages, include = FALSE}
+library(dplyr)
+library(ggplot2)
+```
+
+## Setup
+
+* Etherpad page https://etherpad.net/
+* Create a directory for today's session 
+* Download lecture notes https://github.com/wampeh1/Ecog314_Fall2017
+
+
+## Introduction
+
+* About the instructor
+* Announcements
+
+
+## Objectives
+
+* Write a program and present results using R Markdown
+* Define reproduciblity and explain the benefits 
+* Review R programming topics
+* Illustrate financial literacy concepts 
+* List investment strategies for ordinary investors
+
+
+## Financial Literacy Topics
+
+* Interest rates and inflation
+* Risk and diversification
+* The relationship between bond prices and interest rates
+* The impact that a shorter term can have on total interest payments
+
+
+## Programming Topics
+
+* Reproducible Research
+* R Markdown
+
+
+## Reproducibile Research
+
+
+### Reproduciblity
+
+The ability to repeat an analysis and get the same result with the same data
+
+* *What did you do? What did you use?*
+* Repeatable
+
+----
+
+### [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming)
+
+A programming paradigm where programs are written with a mix of natural language explanations of the steps taken and computer code to carry it out. 
+
+* *What were you thinking? Did you explain your decisions?*
+* Communicate
+
+----
+
+### Replicability
+
+The ability to duplicate an analysis and get the same results with new data
+
+* Were your results a fluke? Do your findings hold using different statistical samples?
+* Corroborate   
+
+
+
+## Introduce R Markdown
+
+R Markdown package:
+
+* Combine R code, output, and formatted text
+* Encourages Reproducible Research through Literate Programming.
+* Creates nicely formatted documents that include output from R
+* Useful for communicating results, collaborating with others, and documenting your work
+
+References 
+
+* http://rstudio.com/cheatsheets
+* http://r4ds.had.co.nz/r-markdown.html
+
+
+
+## Live coding
+
+* Create an R Markdown Document in RStudio
+* Demonstrate R Markdown features
+
+
+## Create an R Markdown Document in RStudio
+
+1. From the menu: File >> New >> R Markdown
+2. Take the defaults
+4. Click OK 
+
+This opens a new file in the source pane, with a template created by RStudio.
+
+
+## Main parts of an R Markdown document
+
+1. YAML header
+2. R code chunks
+3. Markdown text
+    
+
+## Rendering a document
+
+1. Save the file with `.Rmd` file extension
+2. Knit the document 
+    * Click on the "Knit" button,
+    * Type `Ctrl + Shift + K`
+    * Use the menu: File >> Knit Document
+    * console command
+    
+
+## Editing a Document
+
+Refer to http://rstudio.com/cheatsheets
+
+---- 
+
+### Header
+
+* title
+* date
+* author
+* change the output format
+    * `html_document`
+    * `pdf_document`
+    * `beamer_presentation`
+
+----
+
+### Markdown text
+
+Add text to the body
+
+* Add / delete text
+* bold, italics, underline
+* headings
+* lists
+* links
+* tables
+
+----
+
+### LaTeX (Math)
+
+Reference: https://en.wikibooks.org/wiki/LaTeX/Mathematics
+
+* Add an inline equation: `$ E = mc^{2} $`
+* Add a centered Equation: `$$ y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \epsilon $$` 
+* Complex math: $\forall x \in \mathbb{R}^1, \sqrt{x} = i \implies x = -1$
+
+
+## Code Blocks
+
+### Edit the code block with the summary
+
+* change the data frame to `mtcars`
+* run the `str` function
+* print the data frame
+
+### Edit the code block with the plot
+
+* load ggplot2 library
+* create a scatterplot of speed vs stopping distance
+
+### Run code blocks interactively
+
+* line-by-line
+* entire code block
+
+----
+
+### Code block options
+
+* specify programming language
+* code chunk name
+* `echo = TRUE` -- Show the code
+* `results = "hide"` -- run the code, show the code, but do not show the results
+* `include = FALSE` -- run the code, but do not show either the code or the results
+* `eval = FALSE` -- show the code, but do not run it
+* `cache = TRUE` -- save the output
+* `results = "asis"`
+
+
+## Inline R Code
+
+Enclose the expression in backticks `` `r `` with the name of the language 
+
+`Pick a random number between 1 and 10: ` `` `r `` `sample(1:10, size = 1)` `` ` ``
+    
+Renders as:
+
+Pick a random number between 1 and 10: `r sample(1:10, size = 1)`
+
+
+## Start new document
+
+* Create a new R Markdown file
+* Take the defaults
+* Clear the template
+
+---
+
+## Add an introduction
+
+*What do we intend to do?*
+
+The FINRA Investor Education Foundation conducted a survey to study how people 
+manage their resources and make financial decisions. The survey includes
+several benchmark questions to assess understanding of key financial concepts.
+In today's class we will try a few of these benchmark questions, 
+illustrate the concepts using R code, and explore the nationwide survey results.
+
+* Insert a link to the FINRA homepage: http://www.usfinancialcapability.org/
+* Save the file, knit it, and click on the link in the rendered document
+    
+## Take the quiz
+
+http://www.usfinancialcapability.org/quiz.php
+
+
+## Take notes
+
+Describe what we are doing: taking the quiz, getting familiar with the survey.
+
+* Add two sections with headings to the document: 
+
+1. "Taking the online survey", "About the survey", etc.
+    
+> *In order to familiarize ourselves with the survey, we took the online financial literacy quiz. The first question deals with interest earning savings...*
+
+2. "References"
+
+> "Financial Literacy Quiz," Take the Financial Literacy Quiz, FINRA Investor Education Foundation, Accessed October 6, 2017, http://www.usfinancialcapability.org/quiz.php.
+
+
+
+## Question 1
+
+Suppose you have \$100 in a savings account earning 2 percent interest a year. After five years, how much would you have?
+
+a. More than \$102 
+b. Exactly \$102 
+c. Less than \$102 
+d. Don't Know 
+
+* Key concept: interest earning assets gain value as time passes
+
+
+## Question 1: Model
+
+To show that we have answered correctly, we will model the accumulation of interest using R
+
+Given: 
+
+* $r$ is the interest rate where $r \in [0, 1]$
+* $b$ is a vector of account balances
+* $b_{t} = b_{t-1} + (rb_{t-1})$ 
+
+$$ b = \left[ \begin{matrix} b_{t}  \\ b_{t+1} \\ \vdots \\ b_{t+n} \end{matrix} \right] $$  
+
+Goal: create a vector where each element is the account balance at a different point in time
+
+
+## Question 1: R code
+
+Use a for-loop to compute the interest in each period
+
+Let's visualize these results.  
+
+
+## Question 2
+
+Imagine that the interest rate on your savings account is 1 percent a year and inflation is 2 percent a year. After one year, would the money in the account buy more than it does today, exactly the same or less than today?
+
+* Inflation reduces the buying power of the savings account. The nominal value is not the same thing as real value. 
+
+* Let's compute the Inflation adjusted returns. Using the investopedia rule.
+* Add a reference to the source at the end of the document
+
+
+> "Inflation-Adjusted Returns", Inflation-Adjusted Returns, accessed 2017-10-07, http://www.investopedia.com/terms/i/inflation_adjusted_return.asp
+
+
+## Question 2: R code
+
+
+## Survey Data
+
+Let's look at the data and see how people responded to these questions in the survey.
+
+## Create a new section heading
+
+Create a section entitled "Data". Add text to describe where we are getting our data
+
+*Data for the 2015 National Financial Capability Study (NFCS) 
+are available for download from the foundation's website. To 
+keep track of what we are doing we will use R to download 
+the 2015 State-by-State Respondent-Level Data.*
+    
+
+## Create directories
+
+Store raw data separately. To maintain reproducibility, do not alter the raw input data.
+
+```{r create-raw-data-directory, echo = FALSE}
+# location for raw source data downloaded from the internet
+raw_dir <- file.path("data", "raw")
+
+if ( !dir.exists(raw_dir) ) {
+    dir.create(raw_dir)
+}
+```
+
+## Download the raw data, unzip
+
+
+```{r download-2015-data, results = "hide"}
+
+# Source data
+link <- "http://www.usfinancialcapability.org/downloads/NFCS_2015_State_by_State_Data_Excel.zip"
+
+# Path for a local copy of the file
+save_as <- file.path(raw_dir, basename(link))
+
+
+# Conditionally downlad and unzip the file
+if ( !file.exists(save_as) ) { 
+    
+    # Download the raw data file if we don't already have it
+    download.file(link, save_as)
+    unzip(save_as, exdir = raw_dir)  
+
+} else if ( !file.exists(file.path(raw_dir, "NFCS 2015 State Data 160619.csv")) ) {
+    
+    # Extract all raw data files from an existing zip file
+    unzip(zip_file, exdir = raw_dir)  
+    
+} else {
+
+    list.files(raw_dir)
+
+}
+```
+
+
+## Import the raw data
+
+
+
+## Clean the data, filter an reformat variables
+
+
+## Explore the data
