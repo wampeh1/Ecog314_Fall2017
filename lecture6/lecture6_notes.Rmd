@@ -1,0 +1,716 @@
+---
+title: "Lecture 6 Notes"
+author: "Damian Thomas"
+date: "2017-10-06"
+toc: true
+output: pdf_document
+---
+
+
+```{r load-r-packages, include = FALSE}
+library(dplyr)
+library(ggplot2)
+```
+
+\newpage
+
+## Setup
+
+* Etherpad page https://etherpad.net/
+* Create a directory for today's session 
+* Download lecture notes https://github.com/wampeh1/Ecog314_Fall2017
+
+
+## Introduction
+
+* About the instructor
+* Announcements
+
+
+## Objectives
+
+* Write a program and present results using R Markdown
+* Define reproduciblity and explain the benefits 
+* Review R programming topics
+* Illustrate financial literacy concepts 
+* List investment strategies for ordinary investors
+
+
+## Financial Literacy Topics
+
+* Interest rates and inflation
+* Risk and diversification
+* The relationship between bond prices and interest rates
+* The impact that a shorter term can have on total interest payments
+
+
+## Programming Topics
+
+* Reproducible Research
+* R Markdown
+
+
+## Reproducibile Research
+
+
+### Reproduciblity
+
+The ability to repeat an analysis and get the same result with the same data
+
+* *What did you do? What did you use?*
+* Repeatable
+
+
+
+### [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming)
+
+A programming paradigm where programs are written with a mix of natural language explanations of the steps taken and computer code to carry it out. 
+
+* *What were you thinking? Did you explain your decisions?*
+* Communicate
+
+
+
+### Replicability
+
+The ability to duplicate an analysis and get the same results with new data
+
+* Were your results a fluke? Do your findings hold using different statistical samples?
+* Corroborate   
+
+
+
+## Introduce R Markdown
+
+R Markdown package:
+
+* Combine R code, output, and formatted text
+* Encourages Reproducible Research through Literate Programming.
+* Creates nicely formatted documents that include output from R
+* Useful for communicating results, collaborating with others, and documenting your work
+
+References 
+
+* http://rstudio.com/cheatsheets
+* http://r4ds.had.co.nz/r-markdown.html
+
+
+
+## Live coding
+
+* Create an R Markdown Document in RStudio
+* Demonstrate R Markdown features
+
+
+## Create an R Markdown Document in RStudio
+
+1. From the menu: File >> New >> R Markdown
+2. Take the defaults
+4. Click OK 
+
+This opens a new file in the source pane, with a template created by RStudio.
+
+
+## Main parts of an R Markdown document
+
+1. YAML header
+2. R code chunks
+3. Markdown text
+    
+
+## Rendering a document
+
+1. Save the file with `.Rmd` file extension
+2. Knit the document 
+    * Click on the "Knit" button,
+    * Type `Ctrl + Shift + K`
+    * Use the menu: File >> Knit Document
+    * console command
+    
+
+## Editing a Document
+
+Refer to http://rstudio.com/cheatsheets
+
+ 
+
+### Header
+
+* title
+* date
+* author
+* change the output format
+    * `html_document`
+    * `pdf_document`
+    * `beamer_presentation`
+
+
+
+### Markdown text
+
+Add text to the body
+
+* Add / delete text
+* bold, italics, underline
+* headings
+* lists
+* links
+* tables
+
+
+
+### LaTeX (Math)
+
+Reference: https://en.wikibooks.org/wiki/LaTeX/Mathematics
+
+* Add an inline equation: `$ E = mc^{2} $`
+* Add a centered Equation: `$$ y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \epsilon $$` 
+* Complex math: $\forall x \in \mathbb{R}^1, \sqrt{x} = i \implies x = -1$
+
+
+## Code Blocks
+
+### Edit the code block with the summary
+
+* change the data frame to `mtcars`
+* run the `str` function
+* print the data frame
+
+### Edit the code block with the plot
+
+* load ggplot2 library
+* create a scatterplot of speed vs stopping distance
+
+### Run code blocks interactively
+
+* line-by-line
+* entire code block
+
+
+
+### Code block options
+
+* specify programming language
+* code chunk name
+* `echo = TRUE` -- Show the code
+* `results = "hide"` -- run the code, show the code, but do not show the results
+* `include = FALSE` -- run the code, but do not show either the code or the results
+* `eval = FALSE` -- show the code, but do not run it
+* `cache = TRUE` -- save the output
+* `results = "asis"`
+
+
+## Inline R Code
+
+Enclose the expression in backticks `` `r `` with the name of the language 
+
+`Pick a random number between 1 and 10: ` `` `r `` `sample(1:10, size = 1)` `` ` ``
+    
+Renders as:
+
+Pick a random number between 1 and 10: `r sample(1:10, size = 1)`
+
+
+## Start new document
+
+* Create a new R Markdown file
+* Take the defaults
+* Clear the template
+
+---
+
+## Add an introduction
+
+*What do we intend to do?*
+
+The FINRA Investor Education Foundation conducted a survey to study how people 
+manage their resources and make financial decisions. The survey includes
+several benchmark questions to assess understanding of key financial concepts.
+In today's class we will try a few of these benchmark questions, 
+illustrate the concepts using R code, and explore the nationwide survey results.
+
+* Insert a link to the FINRA homepage: http://www.usfinancialcapability.org/
+* Save the file, knit it, and click on the link in the rendered document
+    
+## Take the quiz
+
+http://www.usfinancialcapability.org/quiz.php
+
+
+## Take notes
+
+Describe what we are doing: taking the quiz, getting familiar with the survey.
+
+* Add two sections with headings to the document: 
+    1. "Taking the online survey", "About the survey", etc.
+    
+> *In order to familiarize ourselves with the survey, we took the online financial literacy quiz. The first question deals with interest earning savings...*
+
+    2. "References"
+
+> "Financial Literacy Quiz," Take the Financial Literacy Quiz, FINRA Investor Education Foundation, Accessed October 6, 2017, http://www.usfinancialcapability.org/quiz.php.
+
+
+
+## Question 1
+
+Suppose you have \$100 in a savings account earning 2 percent interest a year. After five years, how much would you have?
+
+a. More than \$102 
+b. Exactly \$102 
+c. Less than \$102 
+d. Don't Know 
+
+* Key concept: interest earning assets gain value as time passes
+
+
+To show that we have answered correctly, we will model the accumulation of interest using R
+
+Given: 
+
+* $r$ is the interest rate where $r \in [0, 1]$
+* $b$ is a vector of account balances
+* $b_{t} = b_{t-1} + (rb_{t-1})$ 
+
+$$ b = \left[ \begin{matrix} b_{t}  \\ b_{t+1} \\ \vdots \\ b_{t+n} \end{matrix} \right] $$  
+
+Goal: create a vector where each element is the account balance at a different point in time
+
+
+## Question 1: R code
+
+To implement this mental model in R, start with the fixed parameters, then use a for-loop to compute the interest in each period
+
+```{r question-1-code, eval = TRUE, echo = TRUE}
+interest_rate <- 0.02
+balance <- 100 # starting balance
+n <- 5
+
+for ( i in 1:n ) {
+    t <- i + 1
+    balance[t] <- balance[t-1]  + (interest_rate * balance[t-1])
+}
+```
+
+Based on this model we can confirm that: after 5 periods of compounding the account balance will be `r balance[6]`. A complete table of values is presented below.
+
+```{r account-balance-table}
+# take the vector and create a data frame
+
+account <- data.frame(
+    t = seq(0, n),
+    balance = balance
+)
+
+knitr::kable(account, caption = "Table of Account Balances")
+```
+
+Let's visualize these results.  
+* Add a code block 
+* load dplyr and ggplot2
+* Suppress the messages and hide the code
+
+```{r quiz-question-1-plot, echo = TRUE, fig.align = "center"}
+account %>%
+    ggplot(mapping = aes(x = t, y = balance)) +
+    geom_bar(stat = "identity") +
+    geom_hline(yintercept = 102) + 
+    labs(title = "Account Balance After 5 years Earning 2% Interest on $100",
+         caption = "The horizontal line represents a balance of $102",
+         x = "Time period",
+         y = "Dollars")
+```
+
+
+## Question 2
+
+Imagine that the interest rate on your savings account is 1 percent a year and inflation is 2 percent a year. After one year, would the money in the account buy more than it does today, exactly the same or less than today?
+
+* Inflation reduces the buying power of the savings account. The nominal value is not the same thing as real value. 
+
+* Let's compute the Inflation adjusted returns. Using the investopedia rule.
+* Add a reference to the source at the end of the document
+
+
+> "Inflation-Adjusted Returns", Inflation-Adjusted Returns, accessed 2017-10-07, http://www.investopedia.com/terms/i/inflation_adjusted_return.asp
+
+
+## Question 2: R code
+
+```{r quiz-question-2, echo = TRUE}
+years <- 2017:2030
+starting_balance <- 100
+interest_rate  <- 0.01
+inflation_rate <- 0.02
+adjusted_rate <- ((1 + interest_rate) / (1 + inflation_rate)) - 1
+adjusted_rate
+
+nominal_balance  <- c()
+nominal_gains    <- c()
+adjusted_gains   <- c()
+adjusted_balance <- c()
+
+for ( t in seq_along(years) ) {
+    if ( t == 1 ) {
+        nominal_gains[t] <- 0
+        adjusted_gains[t] <- 0
+        nominal_balance[t] <- starting_balance
+        adjusted_balance[t] <- nominal_balance[t]
+    } else {
+        nominal_gains[t] <- interest_rate * nominal_balance[t-1]
+        adjusted_gains[t] <- adjusted_rate * adjusted_balance[t-1]
+        nominal_balance[t] <- nominal_balance[t-1] + nominal_gains[t-1]
+        adjusted_balance[t] <- adjusted_balance[t-1] + adjusted_gains[t-1]
+    }
+}
+
+account <- data.frame(year = years,
+                      nominal_gains,
+                      adjusted_gains,
+                      nominal_balance,
+                      adjusted_balance)
+
+account
+```
+
+
+## Question 2: Plots
+
+```{r plot-q2-nominal}
+account %>%
+    ggplot(mapping = aes(x = year, y = nominal_balance)) +
+    geom_bar(stat = "identity") +
+    geom_hline(yintercept = 100) + 
+    labs(title = paste("Change in Nominal Account Balance"),
+         caption = "The horizontal line represents a balance of $100",
+         x = "Year",
+         y = "Dollars")
+```
+
+
+
+```{r plot-q2-inflation-adjusted}
+account %>%
+    ggplot(mapping = aes(x = year, y = adjusted_balance)) +
+    geom_bar(stat = "identity") +
+    geom_hline(yintercept = 100) + 
+    labs(title = paste("Change in Account Balance, Adjusted for inflation"),
+         caption = paste("The horizontal line represents the value of $100 in", min(account$year)),
+         x = "Year",
+         y = "Dollars")
+```
+
+
+## Survey Data
+
+Let's look at the data and see how people responded to these questions in the survey.
+
+## Create a new section heading
+
+Create a section entitled "Data". Add text to describe where we are getting our data
+
+Data for the 2015 National Financial Capability Study (NFCS) 
+are available for download from the foundation's website. To 
+keep track of what we are doing we will use R to download 
+the 2015 State-by-State Respondent-Level Data.
+    
+
+## Create directories
+
+Store raw data separately. To maintain reproducibility, do not alter the raw input data.
+
+```{r create-raw-data-directory}
+# location for raw source data downloaded from the internet
+raw_dir <- file.path("data", "raw")
+
+if ( !dir.exists(raw_dir) ) {
+    dir.create(raw_dir)
+}
+```
+
+## Download the raw data, unzip
+
+
+```{r download-2015-data, results = "hide"}
+
+# Source data
+link <- "http://www.usfinancialcapability.org/downloads/NFCS_2015_State_by_State_Data_Excel.zip"
+
+# Path for a local copy of the file
+save_as <- file.path(raw_dir, basename(link))
+
+
+# Conditionally downlad and unzip the file
+if ( !file.exists(save_as) ) { 
+    
+    # Download the raw data file if we don't already have it
+    download.file(link, save_as)
+    unzip(save_as, exdir = raw_dir)  
+
+} else if ( !file.exists(file.path(raw_dir, "NFCS 2015 State Data 160619.csv")) ) {
+    
+    # Extract all raw data files from an existing zip file
+    unzip(zip_file, exdir = raw_dir)  
+    
+} else {
+
+    list.files(raw_dir)
+
+}
+```
+
+
+## Import the raw data
+
+```{r read-raw-csv}
+raw_data <- read.csv(file = file.path(raw_dir, "NFCS 2015 State Data 160619.csv"))
+```
+
+
+
+## Clean the data, filter an reformat variables
+
+The raw data set has `r ncol(raw_data)` variables and we aren't going to use every variable, so we will restrict the data to a few columns and use more descriptive names. The columns we plan to keep are:
+
+```{r variable-list}
+raw_variables <- c(
+    "NFCSID" = "Respondent ID",
+    "STATEQ" = "State ID",
+    "A3"     = "Gender",
+    "A3Ar_w" = "Age Group",
+    "M6"     = "Question 1: Interest rate",
+    "M7"     = "Question 2: Interest rates and inflation",
+    "M8"     = "Question 3: Interest rates and bond prices",
+    "M31"    = "Question 4: Compounding interest",
+    "M9"     = "Question 5: Compounding and loan term",
+    "M10"    = "Question 6: Diversification",
+    "wgt_n2" = "National-level weight",
+    "wgt_s3" = "State-level weight"
+    )
+
+data.frame(variable = names(raw_variables), 
+           description = unname(raw_variables)) %>%
+    knitr::kable()
+```
+
+Also, we will need to tidy the data by applying labels to the coded values.
+
+```{r value-labels, echo = FALSE}
+
+stateq_label <- c(
+     "1" = "Alabama",
+     "2" = "Alaska",
+     "3" = "Arizona",
+     "4" = "Arkansas",
+     "5" = "California",
+     "6" = "Colorado",
+     "7" = "Connecticut",
+     "8" = "Delaware",
+     "9" = "District of Columbia",
+    "10" = "Florida",
+    "11" = "Georgia",
+    "12" = "Hawaii",
+    "13" = "Idaho",
+    "14" = "Illinois",
+    "15" = "Indiana",
+    "16" = "Iowa",
+    "17" = "Kansas",
+    "18" = "Kentucky",
+    "19" = "Louisiana",
+    "20" = "Maine",
+    "21" = "Maryland",
+    "22" = "Massachusetts",
+    "23" = "Michigan",
+    "24" = "Minnesota",
+    "25" = "Mississippi",
+    "26" = "Missouri",
+    "27" = "Montana",
+    "28" = "Nebraska",
+    "29" = "Nevada",
+    "30" = "New Hampshire",
+    "31" = "New Jersey",
+    "32" = "New Mexico",
+    "33" = "New York",
+    "34" = "North Carolina",
+    "35" = "North Dakota",
+    "36" = "Ohio",
+    "37" = "Oklahoma",
+    "38" = "Oregon",
+    "39" = "Pennsylvania",
+    "40" = "Rhode Island",
+    "41" = "South Carolina",
+    "42" = "South Dakota",
+    "43" = "Tennessee",
+    "44" = "Texas",
+    "45" = "Utah",
+    "46" = "Vermont",
+    "47" = "Virginia",
+    "48" = "Washington",
+    "49" = "West Virginia",
+    "50" = "Wisconsin",
+    "51" = "Wyoming"
+)
+
+a3_label <- c(
+    "1" = "Male",
+    "2" = "Female"
+)
+
+a3ar_w_label <- c(
+    "1" = "18-24",
+    "2" = "25-34",
+    "3" = "35-44",
+    "4" = "45-54",
+    "5" = "55-64",
+    "6" = "65+"
+)
+
+m6_label <- c(
+     "1" = "More than $102",
+     "2" = "Exactly $102",
+     "3" = "Less than $102",
+    "98" = "Don't know",
+    "99" = "Prefer not to say"
+)
+    
+m7_label <- c(
+     "1" = "More than today",
+     "2" = "Exactly the same",
+     "3" = "Less than today",
+    "98" = "Don't know",
+    "99" = "Prefer not to say"
+)
+
+
+m8_label <- c(
+     "1" = "They will rise",
+     "2" = "They will fall",
+     "3" = "They will stay the same",
+     "4" = "There is no relationship between bond prices and the interes",
+    "98" = "Don't know",
+    "99" = "Prefer not to say"
+)
+
+m31_label <- c(
+     "1" = "Less than 2 years",
+     "2" = "At least 2 years but less than 5 years",
+     "3" = "At least 5 years but less than 10 years",
+     "4" = "At least 10 years",
+    "98" = "Don't know",
+    "99" = "Prefer not to say"
+)
+
+m9_label <- c(
+     "1" = "True",
+     "2" = "False",
+    "98" = "Don't know",
+    "99" = "Prefer not to say"
+)
+
+m10_label <- c(
+     "1" = "True",
+     "2" = "False",
+    "98" = "Don't know",
+    "99" = "Prefer not to say"
+)
+
+```
+
+
+
+```{r create-tidy-data}
+clean_data <- raw_data %>%
+    #select_(.dots = names(raw_variables)) %>% # using a character vector to select columns
+    mutate(id = NFCSID,
+           state = stateq_label[STATEQ],
+           #question_1 = factor(M6, levels = names(m6_label), labels = unname(m6_label)),
+           question_1 = m6_label[M6],
+           question_2 = m7_label[M7],
+           question_1_correct = ifelse(question_1 == "More than $102", TRUE, FALSE),
+           question_2_correct = ifelse(question_2 == "Less than today", TRUE, FALSE),
+           state_weight = wgt_s3,
+           national_weight = wgt_n2) %>%
+    select(id, state, question_1, question_2, question_1_correct, question_2_correct, state_weight, national_weight)
+
+str(clean_data)
+```
+
+Explore data
+
+```{r q1-by-state-table}
+clean_data %>%
+    filter(!is.na(question_1)) %>%
+    group_by(state) %>%
+    summarize(q1_correct_pct = 100 * sum(state_weight * question_1_correct) / sum(state_weight)) %>% 
+    arrange(desc(q1_correct_pct)) %>%
+    knitr::kable()
+```
+
+```{r q1-by-state, fig.height = 10}
+clean_data %>%
+    filter(!is.na(question_1)) %>%
+    group_by(state) %>%
+    summarize(q1_correct_pct = 100 * sum(state_weight * question_1_correct) / sum(state_weight)) %>% 
+    arrange(q1_correct_pct) %>%
+    mutate(state = factor(state, state)) %>% 
+    ggplot(mapping = aes(x = state, weight = q1_correct_pct)) +
+    geom_bar(stat = "count") +
+    coord_flip()
+
+```
+
+```{r q2-by-state-table}
+clean_data %>%
+    filter(!is.na(question_2)) %>%
+    group_by(state) %>%
+    summarize(q2_correct_pct = 100 * sum(state_weight * question_2_correct) / sum(state_weight)) %>% 
+    arrange(desc(q2_correct_pct)) %>%
+    knitr::kable()
+```
+
+
+```{r q2-bystate-plot, fig.height = 10 }
+clean_data %>%
+    filter(!is.na(question_2)) %>%
+    group_by(state) %>%
+    summarize(q2_correct_pct = 100 * sum(state_weight * question_2_correct) / sum(state_weight)) %>% 
+    arrange(q2_correct_pct) %>%
+    mutate(state = factor(state, state)) %>% 
+    ggplot(mapping = aes(x = state, weight = q2_correct_pct)) +
+    geom_bar(stat = "count") +
+    coord_flip()
+```
+
+```{r histograms-for-each-state, eval = FALSE, echo = FALSE}
+clean_data %>% 
+    group_by(state, question_1) %>%
+    summarise(wt = sum(state_weight)) %>%
+    ggplot(mapping = aes(x = question_1, group = state, weight = wt)) +
+    geom_bar(stat = "count") +
+    facet_wrap( ~ state, ncol = 7)
+
+```
+
+
+\newpage
+
+## References
+
+
+
+"R for Data Science", http://r4ds.had.co.nz/r-markdown.html
+
+"R Markdown Cheatsheet", http://www.rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf
+
+"LaTeX mathematics", https://en.wikibooks.org/wiki/LaTeX/Mathematics
+
+"Literate Programming", https://en.wikipedia.org/wiki/Literate_programming
+
+"Inflation-Adjusted Returns", Inflation-Adjusted Returns, accessed 2017-10-07, http://www.investopedia.com/terms/i/inflation_adjusted_return.asp
+
+Freakonomics Radio Podcast. "Everything You Always Wanted to Know About Money (But Were Afraid to Ask)". Posted August 2, 2017 at 11:00pm. [http://freakonomics.com/podcast/everything-always-wanted-know-money-afraid-ask/]()
+
+Chicago Manual of Style Online. "Notes and Bibliography: Sample Citations." 2017.  [http://www.chicagomanualofstyle.org/tools_citationguide/citation-guide-1.html#cg-website]()
+
+American Economic Association. "Sample References." 2017. [https://www.aeaweb.org/journals/policies/sample-references]()
+
