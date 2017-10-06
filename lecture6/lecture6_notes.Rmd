@@ -16,9 +16,9 @@ library(ggplot2)
 
 ## Setup
 
-* Etherpad page https://etherpad.net/
+* Etherpad page https://etherpad.net/ecog314_2017-10-06
 * Create a directory for today's session 
-* Download lecture notes https://github.com/wampeh1/Ecog314_Fall2017
+* Download lecture files https://github.com/wampeh1/Ecog314_Fall2017
 
 
 ## Introduction
