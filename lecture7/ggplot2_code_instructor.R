@@ -16,7 +16,7 @@ theme_set(theme_gray())
 
 acs <-
     read.csv(
-        "/msu/home/m1skm01/Howard_ECOG_314/ggplot2_2017F/Data/acs_large.csv",
+        "Data/acs_large.csv",
         stringsAsFactors = F
     )
 # ACD data stats
