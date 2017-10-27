@@ -1,0 +1,246 @@
+---
+title: "Regressions Day 2"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, error = FALSE)
+```
+
+## Load Packages
+
+```{r}
+library(broom)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(stargazer)
+```
+
+## Recap Last Week
+
+Let's read in the data and clean it:
+
+```{r pressure, echo=FALSE}
+ipums_data <- 
+  read.csv("acs_2015_data.csv", stringsAsFactors = FALSE)%>%
+  mutate(new_educ = case_when(EDUC == 1 ~ 5,
+                              EDUC == 2 ~ 9,
+                              EDUC == 3 ~ 10,
+                              EDUC == 4 ~ 11,
+                              EDUC == 5 ~ 12,
+                              EDUC == 6 ~ 13,
+                              EDUC == 7 ~ 14,
+                              EDUC == 8 ~ 15,
+                              EDUC == 9 ~ 16, 
+                              EDUC == 10 ~ 17, 
+                              EDUC == 11 ~ 18), 
+         new_sex  = ifelse(SEX == 1, "Male", "Female"),
+         new_race = case_when(RACE == 1 ~ "White",
+                              RACE == 2 ~ "Black", 
+                              RACE == 3 ~ "American Indian or Alaska Native", 
+                              RACE %in% c(4,5,6) ~ "Asian or Pacific Islander",
+                              RACE == 7 ~ "Other"),
+         new_hispan = ifelse(HISPAN %in% c(1,2,3,4), "Hispanic", "Not Hispanic")) %>%
+         filter(!is.na(new_educ),
+                AGE >= 18,
+                AGE <= 65,
+                EMPSTAT %in% c(1,2),
+                OCC != 0,
+                INCWAGE > 0,
+                INCWAGE < 999999)
+```
+
+Let's run some models
+
+```{r}
+baseline_model <- lm(INCWAGE ~ new_educ, data = ipums_data, weights = PERWT)
+
+summary(baseline_model)
+```
+```{r}
+better_model <- lm(INCWAGE ~ new_educ + new_sex, data = ipums_data, weights = PERWT)
+
+summary(better_model)
+```
+
+Now come up with a better model:
+
+```{r, eval = FALSE}
+
+```
+
+Now we can output them using stargazer
+
+```{r,results='asis'}
+stargazer(baseline_model, better_model, header = FALSE)
+```
+
+## Card & Kruger
+
+Read in the data:
+
+```{r}
+pa_nj_ff <- read.csv("pa_nj_ff.csv", stringsAsFactors = FALSE)
+```
+
+Do some cleaning:
+
+```{r}
+pa_nj_ff[pa_nj_ff == "."] <- NA
+```
+
+
+```{r}
+pa_nj_cleaned <-
+  pa_nj_ff %>%
+  mutate(state = ifelse(STATE == 1, "NJ", "PA"),
+         location = case_when(SOUTHJ == 1 ~ "Southern NJ",
+                              CENTRALJ == 1 ~ "Central NJ",
+                              NORTHJ == 1 ~ "Northern NJ",
+                              PA1 == 1 ~ "Northeast Suburbs of Philadelphia",
+                              PA2 == 1 ~ "Easton",
+                              SHORE == 1 ~ "NJ Shore"),
+          chain = case_when(CHAIN == 1 ~ "Burger King",
+                            CHAIN == 2 ~ "KFC",
+                            CHAIN == 3 ~ "Roys",
+                            CHAIN == 4 ~ "Wendys"),
+          percent_effected_new_min = as.numeric(PCTAFF),
+          num_full_emp_1 = as.numeric(EMPFT),
+          num_part_emp_1 = as.numeric(EMPPT),
+          num_managers_1 = as.numeric(NMGRS),
+          starting_wage_1 = as.numeric(WAGE_ST),
+          num_hours_1 = as.numeric(HRSOPEN),
+          price_soda_1 = as.numeric(PSODE),
+          price_fries_1 = as.numeric(PFRY),
+          price_entree_1 = as.numeric(PENTREE),
+          num_full_emp_2 = as.numeric(EMPFT2),
+          num_part_emp_2 = as.numeric(EMPPT2),
+          num_managers_2 = as.numeric(NMGRS.1),
+          starting_wage_2 = as.numeric(WAGE_ST2),
+          num_hours_2 = as.numeric(HRSOPEN2),
+          price_soda_2 = as.numeric(PSODE2),
+          price_fries_2 = as.numeric(PFRY2),
+          price_entree_2 = as.numeric(PENTREE2),
+          status_2_interview = case_when(STATUS.2 == 0 ~ "refused to answer",
+                                         STATUS.2 == 1 ~ "answered",
+                                         STATUS.2 == 2 ~ "closed-renovations",
+                                         STATUS.2 == 3 ~ "closed-permanently",
+                                         STATUS.2 == 4 ~ "closed-highway",
+                                         STATUS.2 == 5 ~ "closed-fire")) %>%
+  select(state, location, percent_effected_new_min, num_full_emp_1, num_part_emp_1,
+         num_managers_1, starting_wage_1, num_hours_1, price_soda_1, price_fries_1,
+         price_entree_1, num_full_emp_2, num_part_emp_2, num_managers_2, starting_wage_2,
+         num_hours_2, price_soda_2, price_fries_2, price_entree_2, status_2_interview)
+
+glimpse(pa_nj_cleaned)
+```
+
+What is the average wage by state, by fast food chain, before and after the policy goes into effect?
+
+```{r, eval = FALSE}
+avg_emp <- pa_nj_cleaned %>%
+           group_by() %>%
+           summarise()
+  
+  
+avg_emp
+```
+
+What is the total number of employees by state, by fast food chain, before and after the policy goes into effect?
+
+```{r}
+
+```
+
+How many stores are not in the second round? please filter them out.
+
+```{r,eval = FALSE}
+length(pa_nj_cleaned[pa_nj_cleaned$status_2_interview !=  ] )
+
+pa_nj_cleaned_filered <- pa_nj_cleaned %>%
+                         filter(status_2_interview == "")
+```
+
+Make a histogram plot of wages in the two periods and use color to indicate states.
+
+```{r, eval = FALSE}
+ggplot(pa_nj_cleaned_filered) +
+geom_histogram(aes(x = , fill = "Pre-period"), alpha = 0.5) +
+geom_histogram(aes(x = , fill = "Post-period"), alpha = 0.5) +
+labs(x = "Starting Wage",
+     y = "Density",
+     fill = "Starting Wage") +
+theme_minimal()
+```
+
+
+Make a histogram of employment by region before the minimum wage changes and after.
+
+```{r, eval = FALSE}
+ggplot(pa_nj_cleaned_filered) +
+geom_histogram(aes(x = , fill = ), alpha = 0.7) +
+labs(x = "Number of Full Time Employees",
+     y = "Density",
+     fill = "Region") +
+theme_minimal()
+```
+
+Now for some regessions. We need to fix up the data a bit first:
+
+```{r, eval = FALSE}
+regression_data <- 
+  pa_nj_cleaned_filered %>%
+  mutate(change_in_employment_fulltime = num_full_emp_2 - num_full_emp_1,
+         change_in_employment_parttime = num_part_emp_2 - num_part_emp_2)
+
+card_krug_full <- lm(change_in_employment_fulltime ~ )
+```
+
+And now make them look nice!
+
+```{r}
+
+```
+
+## Logit Regressions
+
+Read in data:
+
+```{r}
+grad_school <- read.csv("grad_school.csv", stringsAsFactors = FALSE)
+```
+
+Turn rank into a factor variable:
+
+```{r, eval = FALSE}
+grad_school_cleaned <- grad_school %>%
+                       mutate()
+```
+
+Run the logit model:
+
+```{r}
+grad_school_logit <- glm(admit ~ gre + gpa + rank, 
+                         data = grad_school_cleaned, 
+                         family = "binomial")
+```
+
+Look at the summary of the output.
+
+```{r}
+summary(grad_school_logit)
+```
+
+Now use stargazer to make the output look nice:
+
+```{r}
+
+```
+
+
+
+
+
+
+
