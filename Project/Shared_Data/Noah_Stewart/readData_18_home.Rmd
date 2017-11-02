@@ -1,0 +1,690 @@
+--- 
+title: "Global Import and Export Trade Flow Data Analysis -- IMF Data  -- Ecog314"
+author: "wampeh"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    toc: yes
+  html_notebook:
+    code_folding: hide
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+  revealjs::revealjs_presentation:
+    highlight: pygments
+    theme: sky
+---
+
+***
+***
+
+#Financial Literacy Qeustions
+
+1. Effect of Great Recession (Dec 2007 to June 2009) on import/export to the US
+2. What are the countries US trades with in year X (2015, say)
+2. Top 5% countries US exports and imports from
+3. Trade balance for countries in 2.
+4. US and Chinese export/import to/from selected countries
+5. Top 5 exports countries in Africa (a time series plot over th years)
+
+***
+***
+
+#Data Dictionary
+
+File: DataDictionary.txt
+
+
+### A:  DirectionOfTrade.txt
+Text file of worldwide trade data from January 2013 to May 2016
+
+  1. V1 - Reporter Name (Country Name)
+  2. V2 - Reporter Code (Country ISO 2 Code)
+  3. V3 - Trade Flow (Type of trade: 
+        a. Goods, Value of Exports, Free on board (FOB), US Dollars (including or assuming delivery without charge to the buyer's named destination)
+        b. Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars, 
+        c. Goods, Value of Imports, Free on board (FOB), US Dollars)
+  4. V4 - Partner Name
+  5. V5 - Partner Code
+  6. V6 - Period
+  7. V7 - Trade Value
+
+__Note:__
+  a. CIF -- In __CIF__ agreements, insurance and other costs are assumed by the seller, with liability and costs associated with successful transit paid by the seller up until the goods are received by the buyer. Goods are not considered to be delivered until they are in the buyer's possession.
+  
+    b. FOB -- FOB contracts relieve the seller of responsibility once the goods are shipped. Once goods have passed the ship's rail, they are considered to be delivered into the control of the buyer. When shipping to the buyer begins, the buyer then assumes all liability. FOB including or assuming delivery without charge to the buyer's named destination. 
+
+
+### B countryList.csv
+list of country names, ISO codes and their respective IMF Codes
+
+  1. Country - country name
+  2. ISO.2.Code - country ISO 2-digit code
+  3. IMF.Code - country IMF 3-digit code (numeric)
+  4. ISO.3.Code - country ISO 3-digit code
+  5. Continent - name of Continent (Africa, Asia, Europe, None, North America, Oceana & South America)
+
+
+***
+***
+
+#Setup knitr
+
+```{r knitr, echo=FALSE, warning=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+***
+***
+
+#R packages and libraries used
+
+```{r loadLibraries, echo=FALSE, warning=FALSE, include=FALSE}
+library(stringi)
+library(dplyr)
+library(scales)     #scales data from a to b --- usage: rescale(x, to(c(1, 5)))
+
+library(reshape2)
+library(ggplot2)
+
+library(maps)
+library(zoo)
+# 
+# library(tidyr)
+#suppressPackageStartupMessages( library(stringi) )
+
+```
+
+***
+***
+
+#Set working directory and global variables
+
+Project directory
+
+```{r workDir}
+setwd("F:/Howard_University/Ecog314_Fall2017/IMF_DATA")
+#setwd("/fof/fa/R")
+
+#check working directory
+getwd()
+
+```
+
+
+***
+***
+
+##Set global variable and Load Locally Written R Functions
+
+Using functions to simplify coding
+
+```{r functions_and_global_variables, results='hide', message=FALSE, warning=FALSE}
+source("ecog314_functions.R")
+
+#set data directory and filenames
+set_global_variables()
+
+```
+
+***
+***
+
+#Importing Data into R 
+
+### Note the following could be simplified in using a loop and a function definition
+
+```{r read_raw_data_files, results='hide', message=FALSE, warning=FALSE}
+
+read_raw_data_files()
+
+directionOfTrade <- load_rds_file("directionOfTrade")
+countryList      <- load_rds_file("countryList")
+countryLongLat   <- load_rds_file("countryLongLat")
+
+
+#peek 1st 3 lines in each dataset
+head(directionOfTrade, n=3) 
+head(countryList,      n=3)
+head(countryLongLat,   n=3)   
+
+```
+
+***
+***
+
+#Missing data
+
+### How to locate both (NAs and empty) records or rows?
+
+"APEC";;"Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars";"Iran, Islamic Republic of";"IR"
+"APEC"; ;"Goods, Value of Exports, Free on board (FOB), US Dollars";"Trinidad and Tobago";"TT"
+"APEC";\t;"Goods, Value of Exports, Free on board (FOB), US Dollars";"French Territories: New Caledonia";"NC"
+"APEC";\t\t;"Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars";"Turkey";"TR"
+"APEC";NA;"Goods, Value of Exports, Free on board (FOB), US Dollars";"Trinidad and Tobago";"TT"
+NA;NA;NA;NA
+<NA>;<NA>;<NA>;<NA>
+
+1. __[[:space:]]__ (__?regex__) find element space characters: tab, newline, vertical tab, form feed, carriage return, space
+2. __stri_isempty__  (_stringi_) fastest way to find out whether the elements of a character vector are empty strings('').
+3. __complete.case__  (_stats_) return a logical vector indicating which cases are complete (no missing values -- NA).
+4. __is.na__ (_baseR_) 'Not Available' / Missing Value
+
+```{r locatemissingData}
+# Test case
+# df <- data.frame(A = c("a1", "", "\n", " ", " \t\t", "f1", "g1", NA),
+#                  B = c("a2", "b2", "\t", " ", "\t\t\t", "f2", "g2", NA),
+#                  D = c(1:4, "", NA, 7, NA),
+#                  C = c(1:4, "", 6, 7, NA))
+
+df <- read.table(header=FALSE, sep=';',  as.is = TRUE, text="
+APEC;;Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars;Iran, Islamic Republic of;IR;201301;33258614.94
+APEC; ;Goods, Value of Exports, Free on board (FOB), US Dollars;Trinidad and Tobago;TT;201301;3325861494.17093
+APEC;\t;Goods, Value of Exports, Free on board (FOB), US Dollars;French Territories: New Caledonia;NC;201301;26989110.45
+APEC;\t\t;Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars;Turkey;TR;201301;3261861528.36
+APEC;NA;Goods, Value of Exports, Free on board (FOB), US Dollars;Trinidad and Tobago;TT;201301;3571349884.00
+NA;NA;NA;NA;NA;NA;NA
+<NA>;<NA>;<NA>;<NA>;NA;NA;NA
+;;;;;;;
+Afghanistan and Pakistan; ;Goods, Value of Exports, Free on board (FOB), US Dollars;Turkey;TR;201301;2925627494.23
+Barbados;BB;Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars;Bolivia;BO;201301;2458601206.90
+") 
+ 
+df %>% drop_incomplete_records(drop_empty_entries = "any", drop_na_entries = "any") %>% print
+df %>% drop_incomplete_records(drop_empty_entries = "all", drop_na_entries = "all") %>% print
+```
+
+### Remove both (NAs and empty) records or rows?
+
+Missing data can be a not so trivial problem when analysing a dataset and accounting for it is usually not so straightforward either.
+
+__Note:__ If the amount of missing data is very small relatively to the size of the dataset, then leaving out the few samples with missing features may be the best strategy in order not to bias the analysis, however leaving out available datapoints deprives the data of some amount of information and depending on the situation you face, you may want to look for other fixes before wiping out potentially useful datapoints from your dataset.
+
+__Assumption:__ We are going to leave _any record_ containing a missing data value
+
+```{r clean_raw_data_files}
+
+clean_raw_data_files()
+
+countryList_clean <- load_rds_file("countryList_clean")
+directionOfTrade_clean <- load_rds_file("directionOfTrade_clean")
+countryLongLat_clean <- load_rds_file("countryLongLat_clean")
+
+countryList <- load_rds_file("countryList")
+directionOfTrade <- load_rds_file("directionOfTrade")
+countryLongLat <- load_rds_file("countryLongLat")
+
+#--
+# See what this has on the number of records
+cat(sprintf("\n 1. CountryList: %.2f percent records retained",      dim(countryList_clean)[1]     /dim(countryList)[1]     *100))
+cat(sprintf("\n 2. directionOfTrade: %.2f percent records retained", dim(directionOfTrade_clean)[1]/dim(directionOfTrade)[1]*100))
+cat(sprintf("\n 3. countryLongLat: %.2f percent records retained",  dim(countryLongLat_clean)[1]   /dim(countryLongLat)[1]  *100))
+
+```
+
+
+***
+***
+
+#Now we think we have clean data we can use for our project
+
+__Note:__ Fix some of the data columns
+1. Fix date field
+2. Add trade scale
+
+```{r fix_and_rescale_data, message=FALSE}
+
+fix_dates_add_trade_scale()
+
+directionOfTrade_clean_rescale <- load_rds_file("directionOfTrade_clean_rescale")
+
+head(directionOfTrade_clean_rescale)
+
+
+```
+
+
+***
+***
+
+#Split data into _[import/export]
+
+### V3 - Trade Flow (Type of trade) 
+a. Goods, Value of Exports, Free on board (FOB), US Dollars (including or assuming delivery without charge to the buyer's named destination)
+b. Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars, 
+c. Goods, Value of Imports, Free on board (FOB), US Dollars)
+
+```{r dataSplit, , message=FALSE}  
+
+split_data()
+
+exports_fob_desired <- load_rds_file("exports_fob_desired")
+imports_fob_desired <- load_rds_file("imports_fob_desired")
+imports_cif_desired <- load_rds_file("imports_cif_desired")
+
+head(exports_fob_desired)
+glimpse(exports_fob_desired)
+
+```
+
+
+***
+***
+
+
+#Prepare Data for Financial Literacy Questionis 1 - 5
+
+
+### What are the top 5 import/export countries to the US from Jan 2013 to Dec 2015
+
+
+```{r topY}
+
+
+start_date="Jan 2013"
+end_date = "Dec 2015"
+top_n <- 15
+reporting_country <- "US"
+
+
+get_top_n(start_date="Jan 2013", end_date = "Dec 2015", top_n=15, reporter_partner_ISO_code=reporting_country)
+
+import_export_data_topN <- load_rds_file("import_export_data_topN")
+
+head(import_export_data_topN)
+
+```
+
+***
+***
+
+### Visualize US imports/exports from Jan 2013 to Dec 2015
+
+Show what the data says
+
+```{r showdata}
+
+# start_date="Jan 2013"
+# end_date = "Dec 2015"
+# top_n <- 15
+# reporting_country <- "US"
+
+
+get_top_n(start_date=start_date, end_date = end_date, top_n=15, reporter_partner_ISO_code=reporting_country)
+
+#Using Regular R plot
+us_import_export_data_topN <- load_rds_file("import_export_data_topN")
+exports_fob_desired <- load_rds_file("exports_fob_desired")
+
+#--
+#Other plots
+# Box plot of top 15 exporting countries
+filter(exports_fob_desired, 
+       reporter_ISO_2_code == "US" & date >= start_date & date < end_date & partner_ISO_2_code %in% us_import_export_data_topN$partner_ISO_2_code)  %>%
+  ggplot(., aes(partner_ISO_2_code, trade_value)) + geom_boxplot()
+#ggplot(., aes(partner_ISO_2_code, trade_value, color=partner_ISO_2_code)) + geom_boxplot()
+
+
+
+# tbill_boxes <- ggplot(box_data, aes(x = tenor, 
+#                                     y = rate, fill = tenor)) +
+#     geom_boxplot() +
+#     labs(title = "Distribution of Rates on Treasury Bonds",
+#          x = "Tenor", y = "Rate %") +
+#     scale_fill_discrete(guide = F)
+# tbill_boxes
+
+
+
+# Bar plot exports
+filter(exports_fob_desired, 
+       reporter_ISO_2_code == "US" & date >= start_date & date < end_date & partner_ISO_2_code %in% us_import_export_data_topN$partner_ISO_2_code)  %>%
+  ggplot(., aes(x=partner_ISO_2_code, y=trade_value)) + stat_summary(fun.y="mean", geom="bar")
+
+#bar plot imports
+imports_fob_desired <- load_rds_file("imports_fob_desired")
+filter(imports_fob_desired, 
+       partner_ISO_2_code == "US" & date >= start_date & date < end_date & reporter_ISO_2_code %in% us_import_export_data_topN$partner_ISO_2_code)  %>%
+  ggplot(., aes(x=reporter_ISO_2_code, y=trade_value)) + stat_summary(fun.y="mean", geom="bar")
+
+#CIF
+#bar plot imports
+#imports_cif_desired <- load_rds_file("imports_cif_desired")
+# filter(imports_cif_desired, 
+#        partner_ISO_2_code == "US" & date >= start_date & date < end_date & reporter_ISO_2_code %in% us_import_export_data_topN$partner_ISO_2_code)  %>%
+#   ggplot(., aes(x=reporter_ISO_2_code, y=trade_value)) + stat_summary(fun.y="mean", geom="bar")
+
+
+# plot everything
+
+us_import_export_data_topN.m <- us_import_export_data_topN  %>% 
+  subset(., select=c(partner_ISO_2_code, total_fob_exports, average_fob_exports, total_fob_imports) ) %>%
+  melt(., id.vars='partner_ISO_2_code')
+
+#a
+ggplot(data = us_import_export_data_topN.m, aes(partner_ISO_2_code, value)) + 
+  geom_bar(aes(fill = variable), position = "dodge", stat="identity")+ 
+  facet_wrap(~ variable, nrow = 3)
+
+#b
+ggplot(us_import_export_data_topN.m, aes(partner_ISO_2_code, value)) +   
+  geom_bar(aes(fill = variable), position = "dodge", stat="identity") +
+  ggtitle("Top 15 US trading partners") +
+  labs(y="Value (Billions of US $)", y="Selected Countries") 
+
+#--
+#Sorted
+us_import_export_data_topN.m$partner_ISO_2_code <- factor( us_import_export_data_topN.m$partner_ISO_2_code, levels = as.character(unique(us_import_export_data_topN.m$partner_ISO_2_code)) ) 
+
+
+# plot everything
+ggplot(us_import_export_data_topN.m, aes(partner_ISO_2_code, value)) +   
+  geom_bar(aes(fill = variable), position = "dodge", stat="identity") +
+  ggtitle("Top 15 US trading partners") +
+  labs(y="Value (Billions of US $)", y="Selected Countries") 
+
+ggplot(us_import_export_data_topN.m, mapping = aes(x = variable, y = value)) + 
+  geom_boxplot( )
+
+```
+
+
+***
+***
+
+### Plot Total US FOB/CIF imports/exports values
+
+Visualize overall trade between US and the entire continent
+
+
+
+```{r us_global_trade}
+
+start_date="Jan 2013"
+end_date = "Dec 2015"
+reporting_country <- "US"
+
+title_2 <- paste0("from ",  start_date, end_date) 
+
+#--
+prepare_map_data(reporter_partner_ISO_code=reporting_country)
+
+#--
+#load data
+fobx <- load_rds_file("fobx")
+fobi <- load_rds_file("fobi")
+cifi <- load_rds_file("cifi")
+
+#--
+mapData( mapfile=paste0("./png/", reporting_country, "fobx.png"), 
+                     data=fobx, title=paste(reporting_country, "FOB Exports", title_2), 
+                     label="(FOB - Contracts relieve the seller of responsibility once the goods are shipped)")
+
+mapData( mapfile=paste0("./png/", reporting_country, "fobi.png"), 
+                     data=fobi, title=paste(reporting_country, "FOB Imports", title_2), 
+                     label="(FOB - Contracts relieve the seller of responsibility once the goods are shipped)")
+
+mapData( mapfile=paste0("./png/", reporting_country, "cifi.png"), 
+                     data=cifi, title=paste(reporting_country, "CIF Imports", title_2), 
+                     label="(CIF -- Goods are not considered to be delivered until they are in the buyer's possession)")
+
+```
+
+### Map files
+
+Output map files:
+
+1. [map file 1](./png/UScifi.png)
+2. [map file 2](./png/USfobx.png)
+
+***
+***
+
+#Time series plot and regression
+
+### Time varying plot without first converting data to time series 
+
+# Without first converting the data into time series
+
+```{r notsplot}
+# exports_fob_desired <- load_rds_file("exports_fob_desired")
+# imports_fob_desired <- load_rds_file("imports_fob_desired")
+# imports_cif_desired <- load_rds_file("imports_cif_desired")
+
+
+exports_fob <- load_rds_file("exports_fob")
+imports_fob <- load_rds_file("imports_fob")
+imports_cif <- load_rds_file("imports_cif")
+
+require(scales)
+require(dplyr)
+library(ggplot2)
+library(zoo)
+
+us_ca<- filter(exports_fob, reporter_ISO_2_code == "US" & partner_ISO_2_code == "CA")  %>% 
+  subset( ., select=c(period, trade_value) ) %>%
+  mutate( dates = as.Date( as.yearmon(as.character(period), format="%Y%m")) ) 
+
+us_ch<- filter(exports_fob, reporter_ISO_2_code == "US" & partner_ISO_2_code == "CH")  %>% 
+  subset( ., select=c(period, trade_value) ) %>%
+  mutate( dates = as.Date( as.yearmon(as.character(period), format="%Y%m")) ) 
+
+ggplot(us_ca, aes(x = dates, y = trade_value)) + geom_point(size = 1.5, color="blue")  + geom_line() + 
+  scale_x_date(labels = date_format("%b %Y"), breaks = date_breaks("3 month"), minor_breaks = date_breaks("1 month")) + 
+  labs(title="US Exports to Canada \n(Jan 2013 to May 2016)",
+       x = "Date", y = "Billions of Dollars (US)") + 
+  theme(plot.title = element_text(lineheight=1.2, face="bold", size=10.5, hjust = 0.5 ),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=7.5),
+        axis.text.y = element_text(angle = 90, vjust = 0.5, hjust=1, size=7.5)) 
+
+#--
+
+ggplot(us_ca, aes(x = dates, y = trade_value)) + geom_point(size = 1.5, color="blue")  + geom_line() + 
+  geom_point(data=us_ch, aes(x = dates, y = trade_value), size = 1.5, color="red")  + geom_line(data=us_ch) +
+  scale_x_date(labels = date_format("%b %Y"), breaks = date_breaks("3 month"), minor_breaks = date_breaks("1 month")) + 
+  labs(title="US Exports to Canada \n(Jan 2013 to May 2016)",
+       x = "Date", y = "Billions of Dollars (US)") + 
+  theme(plot.title = element_text(lineheight=1.2, face="bold", size=10.5, hjust = 0.5 ),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=7.5),
+        axis.text.y = element_text(angle = 90, vjust = 0.5, hjust=1, size=7.5)) 
+```
+
+***
+***
+```{r xts}
+
+
+# Using time series approach
+
+# #plot
+# require(scales)
+# ggplot(new_df, aes(x = dates, y = value)) + geom_point() + 
+# scale_x_date(labels = date_format("%Y-%m-%d"), breaks = date_breaks("1 month")) + 
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+# ggsave("time_plot.png", height = 4, width = 4)
+# 
+exports_fob <- load_rds_file("exports_fob")
+# imports_fob <- load_rds_file("imports_fob")
+# imports_cif <- load_rds_file("imports_cif")
+
+library(xts)
+usfobx2ca.m <- filter(exports_fob, reporter_ISO_2_code == "US" & partner_ISO_2_code == "CA")  %>% 
+  subset( ., select=c(period, trade_value) ) %>%
+  xts(.$trade_value, order.by=as.yearmon(as.character(.$period), "%Y%m")) %>% subset( ., select=c(trade_value) )
+        
+class(usfobx2ca.m)
+frequency(usfobx2ca.m)
+head(usfobx2ca.m)
+
+#--
+#plot
+require(scales)
+ggplot(usfobx2ca.m, aes(x = as.Date(index(usfobx2ca.m)), y = trade_value)) + geom_point() + geom_line() +
+scale_x_date(labels = date_format("%Y-%m-%d"), breaks = date_breaks("3 months")) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+#ggsave("time_plot.png", height = 4, width = 4)
+
+
+```
+
+
+***
+***
+
+
+```{r}
+
+# https://jennybc.github.io/purrr-tutorial/bk01_base-functions.html
+
+# base
+
+by_obj <- by(gapminder,
+             gapminder$country, 
+             function(df) lm(lifeExp ~ year, data = df))
+str(by_obj[1:2], max.level = 1)
+
+by_obj[[1]]
+
+
+#---
+
+tidyverse
+
+library(tidyr)
+nested_df <- gapminder %>% 
+  group_by(country, continent) %>% 
+  nest() %>% 
+  mutate(fit = map(data, ~ lm(lifeExp ~ year, data = .x)))
+
+nested_df$fit[[1]]
+
+
+```
+
+
+***
+***
+
+```{r}
+
+# Exercise 8 - Plotting multiple lines ------------------------------------
+# Add the lines for `GS10` and `GS30`, they should be orange and blue respectively.
+ggplot(data = recession_data) +
+    geom_line(mapping = aes(x = DATE, y = GS1), 
+              color = "red") +
+    geom_line(mapping = aes(x = DATE, y = GS5), 
+              color = "green") +
+    geom_line(mapping = aes(x = DATE, y = GS10),
+              color = "orange") +
+    geom_line(mapping = aes(x = DATE, y = GS30),
+              color = "blue")
+
+```
+
+```{r}
+# Plotting multiple lines: melting data
+library(tidyr)
+melted_data <- gather(recession_data, key = tenor,
+                      value = rate, -DATE)
+head(melted_data, 3)
+nrow(recession_data)
+nrow(melted_data)
+
+
+```
+
+```{r multplot}
+
+# When you are finished save your plots to .png files
+exercise_data <- gather(treasuries[, c("GS3", "GS10", "GS30", "UNRATE")],
+                        key = tenor, value = rate)
+
+fill_labs <-  c("GS3" = "3 year",
+                "GS10" = "10 year", 
+                "GS30" = "30 year",
+                "UNRATE" = "Un-rate")
+
+
+# Now it's your turn, make a plot of the unemployment rate, 3, 
+# 30, and 10 year treasury yields for 2015-2016.
+exercise_9_data <- treasuries[treasuries$DATE >= as.Date("2007-01-01") &
+              treasuries$DATE < as.Date("2010-01-01"),
+          c("DATE", "GS3", "GS30", "GS10", "UNRATE")]
+
+exercise_9_data <- gather(exercise_9_data,
+           key = tenor, value = rate, -DATE) 
+
+p1  <- ggplot(exercise_9_data, aes(x = DATE, y = rate, 
+               color = tenor, linetype = tenor)) +
+    geom_line() + 
+    geom_point() +
+    ggtitle("Unemployment and Treasury Bonds",
+            "2007-2009") +
+    scale_x_date(NULL, date_breaks = "1 year", 
+                 date_labels = "%b/%Y") +
+    scale_y_continuous("Rate (percent)") +
+    scale_color_discrete(NULL,
+                         labels = c("GS3" = "3 year",
+                                    "GS30" = "30 year",
+                                    "GS10" = "10 year",
+                                    "UNRATE" = "Un-rate"))
+
+p1
+
+p1+    scale_linetype_discrete(NULL,
+                            labels = c("GS3" = "3 year",
+                                       "GS30" = "30 year",
+                                       "GS10" = "10 year",
+                                       "UNRATE" = "Un-rate"))
+
+
+
+```
+
+
+```{r}
+
+density <- exercise_data %>% 
+    ggplot(aes(x = rate,
+               fill = tenor)) +
+    geom_density(alpha = 0.5, color = "black") +
+    scale_fill_discrete("Tenor", labels = fill_labs) +
+    scale_x_continuous("Value") +
+    ggtitle("Treasury Bills and Unemployment",
+            "monthly historical rates") +
+    labs(caption = "Data obtained from FRED")
+
+violin_plot <- exercise_data %>% 
+    ggplot(aes(x = tenor, y = rate,
+               fill = tenor)) +
+    geom_violin() +
+    scale_fill_discrete(guide = F) +
+    scale_x_discrete("Tenor", labels = fill_labs) +
+    ggtitle("Treasury Bills and Unemployment",
+            "monthly historical rates") +
+    scale_y_continuous("Rate %") +
+    labs(caption = "Data obtained from FRED")
+
+#Does the unemployment rate seem to differ from the Treasury rates?
+violin_plot
+
+
+```
+
+
+
+
+#### Other
+https://mail.google.com/mail/u/0/#inbox/15e82955a02a9a73
+
+
+p <- ggplot(df.yield, aes(x=ref.date, y = value) ) +
+  geom_line(size=1) + geom_point() + facet_grid(~type, scales = 'free') + 
+  labs(title = paste0('The current Brazilian Yield Curve '),
+       subtitle = paste0('Date: ', df.yield$current.date[1]))     
+
+print(p)  
+
+
