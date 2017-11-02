@@ -1,0 +1,239 @@
+Country,ISO.2.Code,IMF.Code,ISO.3.Code,Continent
+Afghanistan,AF,512,AFG,Asia
+Albania,AL,914,ALB,Europe
+Algeria,DZ,612,DZA,Africa
+American Samoa,AS,16,ASM,None
+Andorra,AD,20,AND,Europe
+Angola,AO,614,AGO,Africa
+Anguilla (GB),AI,312,AIA,North America
+Antigua,AG,311,ATG,North America
+Argentina,AR,213,ARG,South America
+Armenia,AM,911,ARM,Europe
+Aruba,AW,533,ABW,South America
+Australia,AU,193,AUS,Oceania
+Austria,AT,122,AUT,Europe
+Azerbaijan,AZ,912,AZE,Europe
+Bahamas,BS,313,BHS,North America
+Bahrain,BH,419,BHR,Asia
+Bangladesh,BD,513,BGD,Asia
+Barbados,BB,316,BRB,North America
+Belarus,BY,913,BLR,Europe
+Belgium,BE,124,BEL,Europe
+Belize,BZ,339,BLZ,North America
+Benin,BJ,638,BEN,Africa
+Bermuda,BM,60,BMU,North America
+Bhutan,BT,514,BTN,Asia
+Bolivia,BO,218,BOL,South America
+"Bonaire, Saint Eustatius and Saba",BQ,None,BES,South America
+Bosnia-Herzegovina,BA,963,BIH,Europe
+Botswana,BW,616,BWA,Africa
+Brazil,BR,223,BRA,South America
+Brunei Darussalam,BN,516,BRN,Africa
+Bulgaria,BG,918,BGR,Europe
+Burkina Faso,BF,748,BFA,Africa
+Burundi,BI,618,BDI,Africa
+Cambodia,KH,522,KHM,Asia
+Cameroon,CM,622,CMR,Africa
+Canada,CA,156,CAN,North America
+Cape Verde,CV,624,CPV,Africa
+Cayman Islands,KY,136,CYM,North America
+Central African Republic,CF,626,CAF,Africa
+Chad,TD,628,TCD,Africa
+Chile,CL,228,CHL,South America
+China,CN,924,CHN,Asia
+Colombia,CO,233,COL,South America
+Commonwealth Dominic,DM,321,DMA,North America
+Comoros,KM,632,COM,Africa
+Congo,CG,634,COG,Africa
+Cook Islands,CK,184,COK,Oceania
+Costa Rica,CR,238,CRI,North America
+Cote d'Ivoire,CI,662,CIV,Africa
+Croatia,HR,960,HRV,Europe
+Cuba,CU,192,CUB,North America
+Curacao,CW,None,CUW,South America
+Cyprus,CY,423,CYP,Europe
+Czech Republic,CZ,935,CZE,Europe
+Denmark,DK,128,DNK,Europe
+Djibouti,DJ,611,DJI,Africa
+Dominican Rep.,DO,243,DOM,North America
+Ecuador,EC,248,ECU,South America
+Egypt,EG,469,EGY,Africa
+El Salvador,SV,253,SLV,North America
+Equatorial Guinea,GQ,642,GNQ,Africa
+Eritrea,ER,643,ERI,Africa
+Estonia,EE,939,EST,Europe
+Ethiopia,ET,644,ETH,Africa
+Faeroe Islands,FO,234,FRO,Europe
+Falkland Islands,FK,238,FLK,South America
+Fiji,FJ,819,FJI,Oceania
+Finland,FI,172,FIN,Europe
+France,FR,132,FRA,Europe
+French Guiana,GF,254,GUF,South America
+French Polynesia,PF,258,PYF,Oceania
+Gabon,GA,646,GAB,Africa
+Gambia,GM,648,GMB,Africa
+Georgia,GE,915,GEO,Europe
+Germany,DE,134,DEU,Europe
+Ghana,GH,652,GHA,Africa
+Gibraltar,GI,292,GIB,Europe
+Global IMI,0,None,None,None
+Greece,GR,174,GRC,Europe
+Greenland,GL,304,GRL,North America
+Grenada,GD,328,GRD,North America
+Guadeloupe,GP,312,GLP,North America
+Guam,GU,316,GUM,Oceania
+Guatemala,GT,258,GTM,North America
+"Guernsey, C.I.",GG,None,GGY,Europe
+Guinea,GN,656,GIN,Africa
+Guinea Bissau,GW,654,GNB,Africa
+Guyana,GY,336,GUY,South America
+Haiti,HT,263,HTI,North America
+Honduras,HN,268,HND,North America
+Hong Kong,HK,532,HKG,Asia
+Hungary,HU,944,HUN,Europe
+Iceland,IS,176,ISL,Europe
+India,IN,534,IND,Asia
+Indonesia,ID,536,IDN,Asia
+Iran,IR,429,IRN,Asia
+Iraq,IQ,433,IRQ,Asia
+Ireland,IE,178,IRL,Europe
+Isle of Man,IM,None,IMN,Europe
+Israel,IL,436,ISR,Asia
+Italy,IT,136,ITA,Europe
+Jamaica,JM,343,JAM,North America
+Japan,JP,158,JPN,Asia
+"Jersey, C.I.",JE,None,JEY,Europe
+Jordan,JO,439,JOR,Asia
+Kazakhstan,KZ,916,KAZ,Asia
+Kenya,KE,664,KEN,Africa
+Kiribati,KI,826,KIR,Oceania
+"Korea, Democratic People's Rep. Of",KP,408,PRK,Asia
+"Korea, Republic of",KR,542,KOR,Asia
+Kuwait,KW,917,KGZ,Asia
+Kyrgyzstan,KG,443,KWT,Asia
+Laos,LA,544,LAO,Asia
+Latvia,LV,941,LVA,Europe
+Lebanon,LB,446,LBN,Asia
+Lesotho,LS,666,LSO,Africa
+Liberia,LR,668,LBR,Africa
+Libyan Arab Jamahiriya,LY,672,LBY,Africa
+Liechtenstein,LI,757,LIE,Europe
+Lithuania,LT,946,LTU,Europe
+Luxembourg,LU,137,LUX,Europe
+Macau,MO,546,MAC,Asia
+Macedonia,MK,962,MKD,Europe
+Madagascar,MG,674,MDG,Africa
+Malawi,MW,676,MWI,Africa
+Malaysia,MY,548,MYS,Asia
+Maldives,MV,556,MDV,Asia
+Mali,ML,678,MLI,Africa
+Malta,MT,181,MLT,Europe
+Martinique,MQ,474,MTQ,North America
+Mauritania,MR,682,MRT,Africa
+Mauritius,MU,684,MUS,Africa
+Mayotte,YT,175,MYT,None
+Mexico,MX,273,MEX,North America
+Moldova,MD,921,MDA,Europe
+Monaco,MC,251,MCO,Europe
+Mongolia,MN,948,MNG,Asia
+Montenegro,ME,943,MNE,Europe
+Micronesia,FM,868,FSM,Oceania
+Montserrat,MS,351,MSR,North America
+Morocco,MA,686,MAR,Africa
+Mozambique,MZ,688,MOZ,Africa
+Myanmar,MM,518,MMR,Asia
+Namibia,NA,516,NAM,Africa
+Nepal,NP,558,NPL,Asia
+Netherlands,NL,138,NLD,Europe
+Netherlands Antilles,AN,530,ANT,None
+New Caledonia,NC,540,NCL,Oceania
+New Zealand,NZ,196,NZL,Oceania
+Nicaragua,NI,278,NIC,North America
+Niger,NE,692,NER,Africa
+Nigeria,NG,694,NGA,Africa
+Norway,NO,142,NOR,Europe
+Oman,OM,449,OMN,Asia
+OTHERS,UE,None,None,None
+Pakistan,PK,564,PAK,Asia
+Palestina,PS,275,PSE,Asia
+Panama,PA,283,PAN,North America
+Papua New Guinea,PG,853,PNG,Oceania
+Paraguay,PY,288,PRY,South America
+Peru,PE,293,PER,South America
+Philippines,PH,566,PHL,Asia
+Poland,PL,964,POL,Europe
+Portugal,PT,182,PRT,Europe
+Puerto Rico,PR,359,PRI,North America
+Qatar,QA,453,QAT,Asia
+Democratic Republic of the Congo,CD,636,COD,Africa
+Republic of Kosovo,XK,967,KOS,Europe
+Republic of Serbia,RS,942,SRB,Europe
+Republic of the Marshall Islands,MH,867,MHL,Oceania
+Reunion,RE,638,REU,Africa
+Romania,RO,968,ROM,Europe
+Russia,RU,922,RUS,Europe
+Rwanda,RW,714,RWA,Africa
+Saint Helena,SH,654,SHN,Africa
+Saint Kitts and Nevis,KN,361,KNA,North America
+San Marino,SM,135,SMR,Europe
+Sao Tome and Principe,ST,716,STP,Africa
+Saudi Arabia,SA,456,SAU,Asia
+Senegal,SN,722,SEN,Africa
+Seychelles,SC,718,SYC,Africa
+Sierra Leone,SL,724,SLE,Africa
+Singapore,SG,576,SGP,Asia
+Sint Marteen,SX,None,SXM,North America
+Slovakia,SK,936,SVK,Europe
+Slovenia,SI,961,SVN,Europe
+Solomon Islands,SB,813,SLB,Oceania
+"Somalia, Federal Republic of",SO,726,SOM,Africa
+South Africa,ZA,199,ZAF,Africa
+South Sudan,SS,733,SSD,Africa
+Spain,ES,184,ESP,Europe
+Sri Lanka,LK,524,LKA,Asia
+St Lucia,LC,362,LCA,North America
+St Pierre and Miquel,PM,666,SPM,North America
+St Vincent,VC,364,VCT,North America
+Sudan,SD,732,SDN,Africa
+Surinam,SR,366,SUR,South America
+Swaziland,SZ,734,SWZ,Africa
+Sweden,SE,144,SWE,Europe
+SWIFT,SW,None,None,None
+SWIFT,UT,None,None,None
+Switzerland,CH,146,CHE,Europe
+Syrian Arab Republic,SY,463,SYR,Asia
+Taiwan,TW,528,TWN,Asia
+Tajikistan,TJ,923,TJK,Asia
+Tanzania,TZ,738,TZA,Africa
+Thailand,TH,578,THA,Asia
+Timor-Leste,TL,537,TLS,Asia
+Togo,TG,742,TGO,Africa
+Tonga,TO,866,TON,Oceania
+Trinidad and Tobago,TT,369,TTO,South America
+Tunisia,TN,744,TUN,Africa
+Turkey,TR,186,TUR,Europe
+Turkmenistan,TM,925,TKM,Asia
+Turks & Caicos,TC,796,TCA,North America
+Tuvalu,TV,869,TUV,Oceania
+Uganda,UG,746,UGA,Africa
+Ukraine,UA,926,UKR,Europe
+United Arab Emirates,AE,466,ARE,Asia
+United Kingdom,GB,112,GBR,Europe
+United States,US,111,USA,North America
+Uruguay,UY,298,URY,South America
+Uzbekistan,UZ,927,UZB,Asia
+Vanuatu,VU,846,VUT,Oceania
+Vatican City State,VA,336,VAT,Europe
+Venezuela,VE,299,VEN,South America
+Vietnam,VN,582,VNM,Asia
+"Virgin Islands, U.S.",VI,850,VIR,North America
+"Virgin Islands, G.B.",VG,92,VGB,North America
+Wallis and Futuna Islands,WF,876,WLF,Oceania
+Western Samoa,WS,862,WSM,Oceania
+Yemen,YE,474,YEM,Asia
+Zambia,ZM,754,ZMB,Africa
+Zimbabwe,ZW,698,ZWE,Africa
+Guernsey C.I.,GG,None,GGY,Europe
+Jersey C.I.,JE,None,JEY,Europe
+Korea Democratic People's Rep. Of,KP,408,PRK,Asia
+Korea Republic of,KR,542,KOR,Asia
