@@ -1,0 +1,31 @@
+Data Files
+
+
+(1) DirectionOfTrade.txt – text file of worldwide trade data from January 2013 to May 2016
+
+     V1 – Reporter Name (Country Name)
+     V2 – Reporter Code (Country ISO 2 Code)
+     V3 – Trade Flow (Type of trade: 
+           Goods, Value of Exports, Free on board (FOB), US Dollars, 
+           Goods, Value of Imports, Cost, Insurance, Freight (CIF), US Dollars, 
+           Goods, Value of Imports, Free on board (FOB), US Dollars)
+     V4 – Partner Name
+     V5 – Partner Code
+     V6 – Period
+     V7 – Trade Value
+
+
+====================================================================================
+
+
+(2) countryList.csv – list of country names, ISO codes and their respective IMF Codes
+
+     Country – country name
+     ISO.2.Code – country ISO 2-digit code
+     IMF.Code – country IMF 3-digit code (numeric)
+     ISO.3.Code – country ISO 3-digit code
+     Continent – name of Continent (Africa, Asia, Europe, None, North America, Oceana & South America)
+
+
+
+
